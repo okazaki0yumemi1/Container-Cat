@@ -1,5 +1,6 @@
 ﻿using Container_Cat.EngineAPI;
 using Container_Cat.Models;
+using Container_Cat.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -16,6 +17,8 @@ namespace Container_Cat.Controllers
 
         public IActionResult Index()
         {
+            SystemOperations sysOps = new SystemOperations();
+
             ContainerOperations ops = new ContainerOperations();
             var containers = ops.ListContainersAsync();
             return View();

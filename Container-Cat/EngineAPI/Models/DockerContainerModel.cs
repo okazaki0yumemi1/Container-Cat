@@ -1,15 +1,14 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Container_Cat.Utilities.Containers;
+using System.Runtime.CompilerServices;
 
 namespace Container_Cat.EngineAPI.Models
 {
-    public class ContainerModel
+    public class DockerContainerModel : BaseContainer
     {
-
         public class RootObj
         {
             public DockerContainer[] Property1 { get; set; }
         }
-
         public class DockerContainer
         {
             public string Id { get; set; }
@@ -26,7 +25,6 @@ namespace Container_Cat.EngineAPI.Models
             public Networksettings NetworkSettings { get; set; }
             public Mount[] Mounts { get; set; }
         }
-
         public class Labels
         {
             public string comdockercomposeconfighash { get; set; }
@@ -49,22 +47,14 @@ namespace Container_Cat.EngineAPI.Models
             public string orgopencontainersimageurl { get; set; }
             public string orgopencontainersimageversion { get; set; }
         }
-
         public class Hostconfig
         {
             public string NetworkMode { get; set; }
         }
-
         public class Networksettings
         {
             public Networks Networks { get; set; }
         }
-
-        //public class Networks
-        //{
-        //    public Dashdot_Default dashdot_default { get; set; }
-        //}
-
         public class Networks
         {
             public object IPAMConfig { get; set; }
@@ -81,7 +71,6 @@ namespace Container_Cat.EngineAPI.Models
             public string MacAddress { get; set; }
             public object DriverOpts { get; set; }
         }
-
         public class Port
         {
             public string IP { get; set; }
@@ -89,7 +78,6 @@ namespace Container_Cat.EngineAPI.Models
             public int PublicPort { get; set; }
             public string Type { get; set; }
         }
-
         public class Mount
         {
             public string Type { get; set; }
@@ -99,40 +87,5 @@ namespace Container_Cat.EngineAPI.Models
             public bool RW { get; set; }
             public string Propagation { get; set; }
         }
-        //public class ContainerNetworkPort
-        //{
-        //    public string Ip { get; set; }
-        //    public string PrivatePort { get; set; }
-        //    public string PublicPort { get; set; }
-        //    public string Type { get; set; }
-        //}
-        //public class ContainerHostConfig
-        //{
-        //    public string NetworkSettings { get; set; }
-        //}
-        //public class ContainerNetworkSettings
-        //{
-
-        //}
-        //public class ContainerMountPoint
-        //{
-
-        //}
-        //public string Id { get; set; }
-        //public List<string> Names { get; set; }
-        //public string Image { get; set; }
-        //public string ImageID { get; set; }
-        //public string Command { get; set; }
-        ////public Int64 Created { get; set; }
-        //public Int64 SizeRW { get; set; }
-        //public Int64 SizeRootFs { get; set; }
-        ////public List<string> Labels { get; set; }
-        //public string State { get; set; }
-        //public string Status { get; set; }
-        //public List<ContainerNetworkPort> Ports { get; set; }
-        ////public ContainerHostConfig HostConfig { get; set; }
-        ////public ContainerNetworkSettings NetworkSettings { get; set; }
-        ////public List<ContainerMountPoint> Mounts { get; set; }
-        //public ContainerModel() { }
     }
 }

@@ -1,24 +1,30 @@
-﻿using System.Diagnostics;
+﻿using Container_Cat.Utilities.Linux.Models;
+using System.Diagnostics;
 
 namespace Container_Cat.Utilities
 {
     public class SystemOperations
     {
-        public enum ContainerEngine
+        //This class is used to:
+        //Add HostSystem to List<HostSystem>
+        //Determine if HostSystem contains any container engines
+        //...
+        //Think of it as a tool to populate HostSystem entity with data.
+        enum ContainerEngine
         {
             Docker,
             Podman
         }
-        public struct HostAddress
-        {
-            public string Ip { get; private set; }
-            public string Port { get; private set; }
-        }
-        Dictionary<HostAddress, ContainerEngine> Hosts = new Dictionary<HostAddress, ContainerEngine>();
+        Dictionary<HostAddress, ContainerEngine> Hosts;// = new Dictionary<HostAddress, ContainerEngine>();
         public SystemOperations()
         {
+            //You have to provide HostAddress with IP and Port. 
+            //Right now I am providing IP and Port for my local VM.
+            HostAddress testHost = new HostAddress("192.168.56.101", "2375");
+            if (AddHost(testHost)) Console.WriteLine("Host was added successfully.");
+            else Console.WriteLine("Unable to add host.");
         }
-        private string RunCommand(string command)
+        string RunCommand(string command)
         {
             var processOutput = "";
             var processInfo = new ProcessStartInfo();
@@ -31,7 +37,7 @@ namespace Container_Cat.Utilities
             }
             return processOutput;
         }
-        private bool AddHost(HostAddress hostAddr)
+        bool AddHost(HostAddress hostAddr)
         {
             //validate IP first!
             //also make sure if container engine is correctly initialised
@@ -45,14 +51,18 @@ namespace Container_Cat.Utilities
             else return false; //No Podman or Docker is available on the host.
             return true;
         }
-        private bool IsDockerInstalled()
+        ContainerEngine GetContainerEngine()
+        {
+
+        }
+        bool IsDockerInstalled()
         {
             string getDockerVersion = "docker info";
             string res = RunCommand(getDockerVersion);
             if (res.Length > 0) return true;
             else return false;
         }
-        private bool IsPodmanInstalled() 
+        bool IsPodmanInstalled() 
         {
             return false;
         }
