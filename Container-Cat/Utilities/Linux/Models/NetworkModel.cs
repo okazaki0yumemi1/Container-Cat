@@ -1,7 +1,9 @@
-﻿internal class HostAddress
+﻿public class HostAddress
 {
-    internal string Ip
+    public string Ip
     {
+        get; set;
+        /*
         get { return Ip; }
         set
         {
@@ -19,9 +21,12 @@
             }
             Ip = value;
         }
+        */
     }
-    internal string Port
+    public string Port
     {
+        get; set;
+        /*
         get { return Port; }
         set
         {
@@ -33,8 +38,9 @@
             }
             else throw new ArgumentException("Unable to parse passed Port number to Int32");
         }
+        */
     }
-    internal HostAddress(string _ip, string _port)
+    public HostAddress(string _ip, string _port)
     {
         Ip = _ip;
         Port = _port;

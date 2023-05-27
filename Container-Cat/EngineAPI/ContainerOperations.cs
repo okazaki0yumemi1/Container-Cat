@@ -7,8 +7,13 @@ namespace Container_Cat.EngineAPI
 {
     public class ContainerOperations
     {
-        public ContainerOperations() { }
-        static HttpClient client = new HttpClient();
+        public ContainerOperations(HttpClient _client, HostAddress _nAddr) 
+        { 
+            client = _client;
+            networkAddr = _nAddr;
+        }
+        private readonly HttpClient client;
+        private readonly HostAddress networkAddr;
         //List, inspect are important to implement
         //start, stop, restart, kill - not sure if they are needed right now
         public async Task<List<DockerContainerModel>> ListContainersAsync()
@@ -17,8 +22,10 @@ namespace Container_Cat.EngineAPI
             HttpResponseMessage response = await client.GetAsync("http://192.168.56.101:2375/containers/json");
             if (response.IsSuccessStatusCode) 
             {
+                var settings = new JsonSerializerSettings();
+                settings.TypeNameHandling = TypeNameHandling.All;
                 var str = await response.Content.ReadAsStringAsync();
-                var containerList = JsonConvert.DeserializeObject<List<DockerContainerModel>>(str);
+                var containerList = JsonConvert.DeserializeObject<List<DockerContainerModel>>(str, settings);
                 return containerList;
             }
             else return result;

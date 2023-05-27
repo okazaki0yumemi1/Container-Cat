@@ -9,7 +9,6 @@ namespace Container_Cat.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
@@ -18,9 +17,8 @@ namespace Container_Cat.Controllers
         public IActionResult Index()
         {
             SystemOperations sysOps = new SystemOperations();
-
-            ContainerOperations ops = new ContainerOperations();
-            var containers = ops.ListContainersAsync();
+            var systemsCount = sysOps.InitialiseHostSystemsAsync().Result;
+            var systems = sysOps.GetHostSystems();
             return View();
         }
 
