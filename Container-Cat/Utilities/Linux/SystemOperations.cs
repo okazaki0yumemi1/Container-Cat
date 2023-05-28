@@ -49,7 +49,7 @@ namespace Container_Cat.Utilities
             }
             return processOutput;
         }
-        bool HostIsReachable(HostAddress hostAddress)
+        bool IsHostReachable(HostAddress hostAddress)
         {
             string pingCommand = $"nmap -p {hostAddress.Port} {hostAddress.Ip} -Pn | grep 'Host is up' &> /dev/null && echo up || echo down";
             string result = RunCommand(pingCommand).Replace("\n", "");
@@ -61,19 +61,21 @@ namespace Container_Cat.Utilities
             //validate IP first!
             //also make sure if container engine is correctly initialised
 
-            if (HostIsReachable(hostAddr) == true)
+            if ((IsHostReachable(hostAddr) == true) && (IsAPIAvailable(hostAddr) == true))
             {
                 Hosts.Add(hostAddr);
                 return true;
             }
             else return false;
         }
-        bool IsDockerInstalled()
+        bool IsAPIAvailable(HostAddress hostAddr)
         {
-            string getDockerVersion = "docker info";
-            string res = RunCommand(getDockerVersion);
-            if (res.Length > 0) return true;
+            //curl 192.168.56.99:3375 --connect-timeout 1 | grep "{" &> /dev/null && echo connected || echo no-connection
+            string curlToAddress = $"curl {hostAddr.Ip}:{hostAddr.Port} --max-time 90 --connect-timeout 30 | grep '{{' &> /dev/null && echo connected || echo no-connection"; //Connect timeout = 5 seconds
+            string result = RunCommand(curlToAddress).Replace("\n", "");
+            if (result == "connected") return true;
             else return false;
+
         }
         bool IsPodmanInstalled() 
         {
@@ -92,7 +94,6 @@ namespace Container_Cat.Utilities
             List<HostSystem<DockerContainerModel>> _systems = new List<HostSystem<DockerContainerModel>>();
             var tasks = Hosts.Select(async host =>
             {
-                
                 HostSystem<DockerContainerModel> _system = new HostSystem<DockerContainerModel>(host);
                 ContainerOperations cOps = new ContainerOperations(client, host);
                 var containers = await cOps.ListContainersAsync();
