@@ -2,7 +2,9 @@
 using Container_Cat.EngineAPI.Models;
 using Container_Cat.Utilities.Containers;
 using Container_Cat.Utilities.Linux.Models;
+using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Container_Cat.Utilities
 {
@@ -23,9 +25,15 @@ namespace Container_Cat.Utilities
             //Right now I am providing IP and Port for my local VM.
             Hosts = new List<HostAddress>();
             Systems = new List<HostSystem<DockerContainerModel>>();
-            HostAddress testHost = new HostAddress("192.168.56.101", "2375");
-            if (AddHost(testHost)) Console.WriteLine("Host was added successfully.");
-            else Console.WriteLine("Unable to add host.");
+            List<HostAddress> testHostLits = new List<HostAddress>()
+                {new HostAddress("127.0.0.1", "3375"), new HostAddress("192.168.56.99", "3375"), new HostAddress("192.168.0.104", "3375")};
+            foreach (var testHost in testHostLits)
+            {
+                if(AddHost(testHost)) Console.WriteLine("Host was added successfully.");
+                else Console.WriteLine("Unable to add host.");
+            }
+            //if (AddHost(testHost)) Console.WriteLine("Host was added successfully.");
+            //else Console.WriteLine("Unable to add host.");
         }
         string RunCommand(string command)
         {
@@ -33,6 +41,7 @@ namespace Container_Cat.Utilities
             var processInfo = new ProcessStartInfo();
             processInfo.FileName = "/bin/bash";
             processInfo.Arguments = $"-c \"{command}\"";
+            processInfo.RedirectStandardOutput = true;
             using (var process = Process.Start(processInfo))
             {
                 processOutput = process.StandardOutput.ReadToEnd();
@@ -40,22 +49,24 @@ namespace Container_Cat.Utilities
             }
             return processOutput;
         }
+        bool HostIsReachable(HostAddress hostAddress)
+        {
+            string pingCommand = $"nmap -p {hostAddress.Port} {hostAddress.Ip} -Pn | grep 'Host is up' &> /dev/null && echo up || echo down";
+            string result = RunCommand(pingCommand).Replace("\n", "");
+            if (result == "up") return true;
+            else return false;
+        }
         bool AddHost(HostAddress hostAddr)
         {
-            Hosts.Add(hostAddr);
-            return true;
             //validate IP first!
             //also make sure if container engine is correctly initialised
 
-            //string pingCommand = $"nmap -p {hostAddr.Port} {hostAddr.Ip} &> /dev/null && echo success || echo fail";
-            //RunCommand(pingCommand);
-            //if (pingCommand == "fail") return false; //Host is unreachable
-            //if (IsDockerInstalled())
-            //{ Hosts.Add(hostAddr); }
-            //else if (IsPodmanInstalled())
-            //{ Hosts.Add(hostAddr); }
-            //else return false; //No Podman or Docker is available on the host.
-            //return true;
+            if (HostIsReachable(hostAddr) == true)
+            {
+                Hosts.Add(hostAddr);
+                return true;
+            }
+            else return false;
         }
         bool IsDockerInstalled()
         {
@@ -81,6 +92,7 @@ namespace Container_Cat.Utilities
             List<HostSystem<DockerContainerModel>> _systems = new List<HostSystem<DockerContainerModel>>();
             var tasks = Hosts.Select(async host =>
             {
+                
                 HostSystem<DockerContainerModel> _system = new HostSystem<DockerContainerModel>(host);
                 ContainerOperations cOps = new ContainerOperations(client, host);
                 var containers = await cOps.ListContainersAsync();

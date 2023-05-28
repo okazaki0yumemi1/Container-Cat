@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Container_Cat</RootNamespace>
+    <UserSecretsId>c1d7271c-cdc1-4583-8d99-547037c33ad2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
