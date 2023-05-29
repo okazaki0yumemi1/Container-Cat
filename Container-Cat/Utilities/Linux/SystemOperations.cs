@@ -1,10 +1,7 @@
 ﻿using Container_Cat.EngineAPI;
 using Container_Cat.EngineAPI.Models;
-using Container_Cat.Utilities.Containers;
 using Container_Cat.Utilities.Linux.Models;
-using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Container_Cat.Utilities
 {
@@ -60,9 +57,9 @@ namespace Container_Cat.Utilities
         {
             //validate IP first!
             //also make sure if container engine is correctly initialised
-
-            if ((IsHostReachable(hostAddr) == true) && (IsAPIAvailable(hostAddr) == true))
+            if (IsHostReachable(hostAddr) == true)
             {
+                hostAddr.SetStatus(HostAddress.HostAvailability.NotTested);
                 Hosts.Add(hostAddr);
                 return true;
             }
@@ -75,11 +72,25 @@ namespace Container_Cat.Utilities
             string result = RunCommand(curlToAddress).Replace("\n", "");
             if (result == "connected") return true;
             else return false;
-
         }
-        bool IsPodmanInstalled() 
+        async Task<Utilities.Linux.Models.HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
-            return false;
+            try
+            {
+                using HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/info");
+                switch ((int)response.StatusCode)
+                {
+                    case 200: return HostAddress.HostAvailability.Connected;
+                    case >= 400 and < 500: return HostAddress.HostAvailability.Unreachable;
+                    default: return HostAddress.HostAvailability.Unreachable;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException caught while testing host availability.");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return HostAddress.HostAvailability.NotTested;
+            }
         }
         public List<HostSystem<DockerContainerModel>> GetHostSystems()
         {
@@ -95,22 +106,21 @@ namespace Container_Cat.Utilities
             var tasks = Hosts.Select(async host =>
             {
                 HostSystem<DockerContainerModel> _system = new HostSystem<DockerContainerModel>(host);
-                ContainerOperations cOps = new ContainerOperations(client, host);
-                var containers = await cOps.ListContainersAsync();
-                _system.AddContainers(containers);
+                var probe = await IsAPIAvailableAsync(host);
+                if (probe == HostAddress.HostAvailability.Connected)
+                {
+                    host.SetStatus(HostAddress.HostAvailability.Connected);
+                    ContainerOperations cOps = new ContainerOperations(client, host);
+                    var containers = await cOps.ListContainersAsync();
+                    _system.AddContainers(containers);
+                }
+                else host.SetStatus(HostAddress.HostAvailability.Unreachable);
                 _systems.Add(_system);
             });
             await Task.WhenAll(tasks);
             Systems.AddRange(_systems);
             Systems.Distinct();
             return _systems.Count;
-            //foreach (HostAddress _host in Hosts) 
-            //{
-            //    HostSystem _system = new HostSystem(_host);
-            //    ContainerOperations cOps = new ContainerOperations(client, _host);
-            //    var containers = await cOps.ListContainersAsync();
-            //    systems.Add( _system );
-            //}
         }
     }
 }

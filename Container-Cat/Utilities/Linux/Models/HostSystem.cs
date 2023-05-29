@@ -13,6 +13,7 @@ namespace Container_Cat.Utilities.Linux.Models
             Containers = new List<T>();
             NetworkAddress = _networkAddr;
             Id = Guid.NewGuid();
+            NetworkAddress.SetStatus(HostAddress.HostAvailability.NotTested);
         }
         public List<ContainerEngine> GetInstalledContainerEngines()
         {
