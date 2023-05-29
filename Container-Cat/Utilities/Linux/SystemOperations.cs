@@ -12,25 +12,22 @@ namespace Container_Cat.Utilities
         //Determine if HostSystem contains any container engines
         //...
         //Think of it as a tool to populate HostSystem entity with data.
-        //Dictionary<HostAddress, ContainerEngine> Hosts;// = new Dictionary<HostAddress, ContainerEngine>();
         static List<HostAddress> Hosts = new List<HostAddress>();
         static HttpClient client = new HttpClient();
         List<HostSystem<DockerContainerModel>> Systems;
         public SystemOperations()
         {
             //You have to provide HostAddress with IP and Port. 
-            //Right now I am providing IP and Port for my local VM.
+            //Right now I am providing IP and Port for my local VMs.
             Hosts = new List<HostAddress>();
             Systems = new List<HostSystem<DockerContainerModel>>();
             List<HostAddress> testHostLits = new List<HostAddress>()
-                {new HostAddress("127.0.0.1", "3375"), new HostAddress("192.168.56.99", "3375"), new HostAddress("192.168.0.104", "3375")};
+                {new HostAddress("127.0.0.1", "3375"), new HostAddress("192.168.56.999", "3375"), new HostAddress("192.168.0.104", "3375")};
             foreach (var testHost in testHostLits)
             {
                 if(AddHost(testHost)) Console.WriteLine("Host was added successfully.");
                 else Console.WriteLine("Unable to add host.");
             }
-            //if (AddHost(testHost)) Console.WriteLine("Host was added successfully.");
-            //else Console.WriteLine("Unable to add host.");
         }
         string RunCommand(string command)
         {
@@ -42,6 +39,7 @@ namespace Container_Cat.Utilities
             using (var process = Process.Start(processInfo))
             {
                 processOutput = process.StandardOutput.ReadToEnd();
+                
                 process.Kill();
             }
             return processOutput;
@@ -54,7 +52,7 @@ namespace Container_Cat.Utilities
             else return false;
         }
         bool AddHost(HostAddress hostAddr)
-        {
+        { 
             //validate IP first!
             //also make sure if container engine is correctly initialised
             if (IsHostReachable(hostAddr) == true)
