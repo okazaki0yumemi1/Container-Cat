@@ -14,13 +14,13 @@ namespace Container_Cat.Utilities
         //Think of it as a tool to populate HostSystem entity with data.
         static List<HostAddress> Hosts = new List<HostAddress>();
         static HttpClient client = new HttpClient();
-        List<HostSystem<DockerContainerModel>> Systems;
+        List<HostSystem<DockerContainer>> Systems;
         public SystemOperations()
         {
             //You have to provide HostAddress with IP and Port. 
             //Right now I am providing IP and Port for my local VMs.
             Hosts = new List<HostAddress>();
-            Systems = new List<HostSystem<DockerContainerModel>>();
+            Systems = new List<HostSystem<DockerContainer>>();
             List<HostAddress> testHostLits = new List<HostAddress>()
                 {new HostAddress("127.0.0.1", "3375"), new HostAddress("192.168.56.999", "3375"), new HostAddress("192.168.0.104", "3375")};
             foreach (var testHost in testHostLits)
@@ -90,7 +90,7 @@ namespace Container_Cat.Utilities
                 return HostAddress.HostAvailability.NotTested;
             }
         }
-        public List<HostSystem<DockerContainerModel>> GetHostSystems()
+        public List<HostSystem<DockerContainer>> GetHostSystems()
         {
             return Systems;
         }
@@ -100,10 +100,10 @@ namespace Container_Cat.Utilities
          */
         public async Task<int> InitialiseHostSystemsAsync()
         {
-            List<HostSystem<DockerContainerModel>> _systems = new List<HostSystem<DockerContainerModel>>();
+            List<HostSystem<DockerContainer>> _systems = new List<HostSystem<DockerContainer>>();
             var tasks = Hosts.Select(async host =>
             {
-                HostSystem<DockerContainerModel> _system = new HostSystem<DockerContainerModel>(host);
+                HostSystem<DockerContainer> _system = new HostSystem<DockerContainer>(host);
                 var probe = await IsAPIAvailableAsync(host);
                 if (probe == HostAddress.HostAvailability.Connected)
                 {

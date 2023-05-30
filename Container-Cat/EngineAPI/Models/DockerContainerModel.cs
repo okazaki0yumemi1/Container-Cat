@@ -1,15 +1,13 @@
 ﻿using Container_Cat.Utilities.Containers;
-using System.Runtime.CompilerServices;
 
 namespace Container_Cat.EngineAPI.Models
 {
-    public class DockerContainerModel : BaseContainer
-    {
-        public class RootObj
-        {
-            public DockerContainer[] Property1 { get; set; }
-        }
-        public class DockerContainer
+
+
+    //public class DockerContainer 
+    //{
+    //    public DockerContainer() { }
+        public class DockerContainer : BaseContainer
         {
             public string Id { get; set; }
             public string[] Names { get; set; }
@@ -87,5 +85,5 @@ namespace Container_Cat.EngineAPI.Models
             public bool RW { get; set; }
             public string Propagation { get; set; }
         }
-    }
+    //}
 }

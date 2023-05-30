@@ -13,33 +13,32 @@ namespace Container_Cat.EngineAPI
         }
         private readonly HttpClient client;
         private readonly HostAddress networkAddr;
-        private static EngineAPIEndpoints.Containers cEndpoint;
+        private static EngineAPIEndpoints.Containers cEndpoint = new EngineAPIEndpoints.Containers() { };
         //List, inspect are important to implement
         //start, stop, restart, kill - not sure if they are needed right now
 
-        public async Task<List<DockerContainerModel>> ListContainersAsync()
+        public async Task<List<DockerContainer>> ListContainersAsync()
         {
-            List<DockerContainerModel> result = new List<DockerContainerModel>();
+            List<DockerContainer> result = new List<DockerContainer>();
             HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetAllContainers);
             if (response.IsSuccessStatusCode) 
             {
                 var settings = new JsonSerializerSettings();
-                settings.TypeNameHandling = TypeNameHandling.All;
                 var str = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<List<DockerContainerModel>>(str, settings);
+                result = JsonConvert.DeserializeObject<List<DockerContainer>>(str);
                 return result;
             }
             else return null;
         }
-        public async Task<DockerContainerModel> GetContainerByIDAsync(string Id)
+        public async Task<DockerContainer> GetContainerByIDAsync(string Id)
         {
-            DockerContainerModel container = new DockerContainerModel();
+            DockerContainer container = new DockerContainer();
             var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetContainerByID.Replace("{id}", Id);
             HttpResponseMessage response = await client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
                 var str = await response.Content.ReadAsStringAsync();
-                container = JsonConvert.DeserializeObject<DockerContainerModel>(str);
+                container = JsonConvert.DeserializeObject<DockerContainer>(str);
                 return container;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)

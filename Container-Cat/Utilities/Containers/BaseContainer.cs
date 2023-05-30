@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-namespace Container_Cat.Utilities.Containers
+﻿namespace Container_Cat.Utilities.Containers
 {
-    public class BaseContainer
+    public abstract class BaseContainer
     {
-        private string Id { get; set; }
-        private string State { get; set; }
+        public string Id { get; set; }
+        public string State { get; set; }
     }
 }

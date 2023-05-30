@@ -24,6 +24,9 @@ namespace Container_Cat.Utilities.Linux.Models
             Containers.AddRange(containers);
             Containers.Distinct();
         }
+        public void UpdateNetworkStatus()
+        { 
+        }
         //Container engine
         //Network address
         //other stuff - maybe list of container id's?
