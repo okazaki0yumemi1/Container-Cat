@@ -34,18 +34,26 @@ namespace Container_Cat.EngineAPI
         public async Task<DockerContainerModel> GetContainerByIDAsync(string Id)
         {
             DockerContainerModel container = new DockerContainerModel();
-            HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetContainerByID.Replace("{id}", Id));
+            var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetContainerByID.Replace("{id}", Id);
+            HttpResponseMessage response = await client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
                 var str = await response.Content.ReadAsStringAsync();
                 container = JsonConvert.DeserializeObject<DockerContainerModel>(str);
                 return container;
             }
-            else
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
-                Console.WriteLine($"There is no container with Id = {Id}, returning empty container.");
+                Console.WriteLine($"Got Error 400. GET-request to: {uri}.");
+                Console.WriteLine("Returning null.");
                 return null;
             }
+            else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                Console.WriteLine($"Got Error 500. GET-request to: {uri}. Is host {networkAddr.Ip}:{networkAddr.Port} okay?");
+                return null;
+            }
+            else return null;
         }
 
     }
