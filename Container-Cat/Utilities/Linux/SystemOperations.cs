@@ -110,7 +110,11 @@ namespace Container_Cat.Utilities
                     host.SetStatus(HostAddress.HostAvailability.Connected);
                     ContainerOperations cOps = new ContainerOperations(client, host);
                     var containers = await cOps.ListContainersAsync();
-                    _system.AddContainers(containers);
+                    if (containers == null)
+                    {
+                        Console.WriteLine($"Failed to get container list for {host.Ip}:{host.Port}, no containers will be added.");
+                    }
+                    else _system.AddContainers(containers);
                 }
                 else host.SetStatus(HostAddress.HostAvailability.Unreachable);
                 _systems.Add(_system);

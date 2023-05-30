@@ -13,6 +13,7 @@
             public readonly string StartContainer = BaseAddr + "/{id}/start";
             public readonly string StopContainer = BaseAddr + "/{id}/stop";
             public readonly string RestartContainer = BaseAddr + "/{id}/restart";
+            public Containers() { }
         }
         public class Images
         {
