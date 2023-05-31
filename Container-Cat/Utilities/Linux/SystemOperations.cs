@@ -44,9 +44,9 @@ namespace Container_Cat.Utilities
             }
             return processOutput;
         }
-        bool IsHostReachable(HostAddress hostAddress)
+        bool IsHostReachable(HostAddress hostAddr)
         {
-            string pingCommand = $"nmap -p {hostAddress.Port} {hostAddress.Ip} -Pn | grep 'Host is up' &> /dev/null && echo up || echo down";
+            string pingCommand = $"nmap -p {hostAddr.Port} {hostAddr.Ip} -Pn | grep 'Host is up' &> /dev/null && echo up || echo down";
             string result = RunCommand(pingCommand).Replace("\n", "");
             if (result == "up") return true;
             else return false;
@@ -61,14 +61,6 @@ namespace Container_Cat.Utilities
                 Hosts.Add(hostAddr);
                 return true;
             }
-            else return false;
-        }
-        bool IsAPIAvailable(HostAddress hostAddr)
-        {
-            //curl 192.168.56.99:3375 --connect-timeout 1 | grep "{" &> /dev/null && echo connected || echo no-connection
-            string curlToAddress = $"curl {hostAddr.Ip}:{hostAddr.Port} --max-time 90 --connect-timeout 30 | grep '{{' &> /dev/null && echo connected || echo no-connection"; //Connect timeout = 5 seconds
-            string result = RunCommand(curlToAddress).Replace("\n", "");
-            if (result == "connected") return true;
             else return false;
         }
         async Task<Utilities.Linux.Models.HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
@@ -123,6 +115,42 @@ namespace Container_Cat.Utilities
             Systems.AddRange(_systems);
             Systems.Distinct();
             return _systems.Count;
+        }
+        bool IsDockerInstalled(HostAddress hostAddr)
+        {
+            try
+            {
+                using HttpResponseMessage response = client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping").Result;
+                switch ((int)response.StatusCode)
+                {
+                    case 200: return true;
+                    default: return false;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException caught while testing host availability.");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return false;
+            }
+        }
+        bool IsPodmanInstalled(HostAddress hostAddr)
+        {
+            try
+            {
+                using HttpResponseMessage response = client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping").Result;
+                switch ((int)response.StatusCode)
+                {
+                    case 200: return true;
+                    default: return false;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException caught while testing host availability.");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return false;
+            }
         }
     }
 }
