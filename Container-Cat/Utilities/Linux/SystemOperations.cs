@@ -1,11 +1,15 @@
 ﻿using Container_Cat.EngineAPI;
 using Container_Cat.EngineAPI.Models;
-using Container_Cat.Utilities.Linux.Models;
+using Container_Cat.Podman_libpod_API;
+using Container_Cat.Podman_libpod_API.Models;
+using Container_Cat.Utilities.Containers;
+using Container_Cat.Utilities.Models;
+using Container_Cat.Utilities.Models.Models;
 using System.Diagnostics;
 
 namespace Container_Cat.Utilities
 {
-    public class SystemOperations
+    public class SystemOperations<T> where T : BaseContainer
     {
         //This class is used to:
         //Add HostSystem to List<HostSystem>
@@ -14,16 +18,14 @@ namespace Container_Cat.Utilities
         //Think of it as a tool to populate HostSystem entity with data.
         static List<HostAddress> Hosts = new List<HostAddress>();
         static HttpClient client = new HttpClient();
-        List<HostSystem<DockerContainer>> Systems;
-        public SystemOperations()
+        List<HostSystem<T>> Systems;
+        public SystemOperations(List<HostAddress> hosts)
         {
             //You have to provide HostAddress with IP and Port. 
             //Right now I am providing IP and Port for my local VMs.
             Hosts = new List<HostAddress>();
-            Systems = new List<HostSystem<DockerContainer>>();
-            List<HostAddress> testHostLits = new List<HostAddress>()
-                {new HostAddress("127.0.0.1", "3375"), new HostAddress("192.168.56.999", "3375"), new HostAddress("192.168.0.104", "3375")};
-            foreach (var testHost in testHostLits)
+            Systems = new List<HostSystem<T>>();
+            foreach (var testHost in hosts)
             {
                 if(AddHost(testHost)) Console.WriteLine("Host was added successfully.");
                 else Console.WriteLine("Unable to add host.");
@@ -63,7 +65,7 @@ namespace Container_Cat.Utilities
             }
             else return false;
         }
-        async Task<Utilities.Linux.Models.HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
+        async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
             try
             {
@@ -82,7 +84,7 @@ namespace Container_Cat.Utilities
                 return HostAddress.HostAvailability.NotTested;
             }
         }
-        public List<HostSystem<DockerContainer>> GetHostSystems()
+        public List<HostSystem<T>> GetHostSystems()
         {
             return Systems;
         }
@@ -92,65 +94,41 @@ namespace Container_Cat.Utilities
          */
         public async Task<int> InitialiseHostSystemsAsync()
         {
-            List<HostSystem<DockerContainer>> _systems = new List<HostSystem<DockerContainer>>();
-            var tasks = Hosts.Select(async host =>
+            var tasks = Systems.Select(async system =>
             {
-                HostSystem<DockerContainer> _system = new HostSystem<DockerContainer>(host);
-                var probe = await IsAPIAvailableAsync(host);
+                var probe = await IsAPIAvailableAsync(system.NetworkAddress);
                 if (probe == HostAddress.HostAvailability.Connected)
                 {
-                    host.SetStatus(HostAddress.HostAvailability.Connected);
-                    ContainerOperations cOps = new ContainerOperations(client, host);
-                    var containers = await cOps.ListContainersAsync();
-                    if (containers == null)
+                    system.NetworkAddress.SetStatus(HostAddress.HostAvailability.Connected);
+                    if (typeof(T) == typeof(DockerContainer))
                     {
-                        Console.WriteLine($"Failed to get container list for {host.Ip}:{host.Port}, no containers will be added.");
+                        HostSystem<DockerContainer> _system = new HostSystem<DockerContainer>(system.NetworkAddress);
+                        DockerContainerOperations cOps = new DockerContainerOperations(client, system.NetworkAddress);
+                        var containers = await cOps.ListContainersAsync();
+                        if (containers.Count != 0)
+                        {
+                            Console.WriteLine($"Failed to get container list for {system.NetworkAddress.Ip}:{system.NetworkAddress.Port}, empty container will be added.");
+                        }
+                        else _system.AddContainers(containers);
                     }
-                    else _system.AddContainers(containers);
+                    else if (typeof(T) == typeof(PodmanContainer))
+                    {
+                        HostSystem<PodmanContainer> _system = new HostSystem<PodmanContainer>(system.NetworkAddress);
+                        PodmanContainerOperations cOps = new PodmanContainerOperations(client, system.NetworkAddress);
+                        var containers = await cOps.ListContainersAsync();
+                        if (containers == null)
+                        {
+                            Console.WriteLine($"Failed to get container list for {system.NetworkAddress.Ip}:{system.NetworkAddress.Port}, no containers will be added.");
+                        }
+                        else _system.AddContainers(containers);
+                    }
+                    else Console.WriteLine($"Unable to get any containers from {system.NetworkAddress.Ip}:{system.NetworkAddress.Port}.");
                 }
-                else host.SetStatus(HostAddress.HostAvailability.Unreachable);
-                _systems.Add(_system);
+                else system.NetworkAddress.SetStatus(HostAddress.HostAvailability.Unreachable);
+                Systems.Add(system);
             });
             await Task.WhenAll(tasks);
-            Systems.AddRange(_systems);
-            Systems.Distinct();
-            return _systems.Count;
-        }
-        bool IsDockerInstalled(HostAddress hostAddr)
-        {
-            try
-            {
-                using HttpResponseMessage response = client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping").Result;
-                switch ((int)response.StatusCode)
-                {
-                    case 200: return true;
-                    default: return false;
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException caught while testing host availability.");
-                Console.WriteLine("Message :{0} ", e.Message);
-                return false;
-            }
-        }
-        bool IsPodmanInstalled(HostAddress hostAddr)
-        {
-            try
-            {
-                using HttpResponseMessage response = client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping").Result;
-                switch ((int)response.StatusCode)
-                {
-                    case 200: return true;
-                    default: return false;
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException caught while testing host availability.");
-                Console.WriteLine("Message :{0} ", e.Message);
-                return false;
-            }
+            return Systems.Count;
         }
     }
 }

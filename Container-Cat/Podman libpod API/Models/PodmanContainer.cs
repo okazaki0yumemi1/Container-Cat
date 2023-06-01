@@ -1,14 +1,9 @@
 ﻿using Container_Cat.Utilities.Containers;
 
-namespace Container_Cat.EngineAPI.Models
+namespace Container_Cat.Podman_libpod_API.Models
 {
-
-
-    //public class DockerContainer 
-    //{
-    //    public DockerContainer() { }
-        public class DockerContainer : BaseContainer
-        {
+    public class PodmanContainer : BaseContainer
+    {
             public string Id { get; set; }
             public string[] Names { get; set; }
             public string Image { get; set; }

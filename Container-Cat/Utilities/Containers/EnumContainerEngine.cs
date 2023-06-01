@@ -3,6 +3,7 @@
         public enum ContainerEngine
         {
             Docker,
-            Podman
+            Podman,
+            Unknown
         }
 }

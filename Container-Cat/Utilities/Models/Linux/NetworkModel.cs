@@ -1,4 +1,4 @@
-﻿namespace Container_Cat.Utilities.Linux.Models
+﻿namespace Container_Cat.Utilities.Models.Models
 {
     public class HostAddress
     {

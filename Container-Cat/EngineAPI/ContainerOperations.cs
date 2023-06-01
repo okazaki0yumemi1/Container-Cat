@@ -1,12 +1,13 @@
 ﻿using Container_Cat.EngineAPI.Models;
 using Newtonsoft.Json;
-using Container_Cat.Utilities.Linux.Models;
+using Container_Cat.Utilities.Containers;
+using Container_Cat.Utilities.Models.Models;
 
 namespace Container_Cat.EngineAPI
 {
-    public class ContainerOperations
+    public class DockerContainerOperations : IContainerOperations<DockerContainer>
     {
-        public ContainerOperations(HttpClient _client, HostAddress _nAddr) 
+        public DockerContainerOperations(HttpClient _client, HostAddress _nAddr) 
         { 
             client = _client;
             networkAddr = _nAddr;
@@ -21,14 +22,14 @@ namespace Container_Cat.EngineAPI
         {
             List<DockerContainer> result = new List<DockerContainer>();
             HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetAllContainers);
-            if (response.IsSuccessStatusCode) 
+            if (response.IsSuccessStatusCode)
             {
                 var settings = new JsonSerializerSettings();
                 var str = await response.Content.ReadAsStringAsync();
                 result = JsonConvert.DeserializeObject<List<DockerContainer>>(str);
                 return result;
             }
-            else return null;
+            else return result;
         }
         public async Task<DockerContainer> GetContainerByIDAsync(string Id)
         {
@@ -55,5 +56,24 @@ namespace Container_Cat.EngineAPI
             else return null;
         }
 
+        public Task<DockerContainer> GetContainerByNameAsync(string Name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> StartContainerAsync(string Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> StopContainerAsync(string Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> RestartContainerAsync(string Id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
