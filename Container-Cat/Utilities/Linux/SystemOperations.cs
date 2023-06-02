@@ -31,6 +31,9 @@ namespace Container_Cat.Utilities
                 else Console.WriteLine("Unable to add host.");
             }
         }
+        //The following lines should not be used because of compatibility and unnecessary code.
+        //Why use bash (and then implement PowerShell and MacOS shell commands) when you can use HttpClient?
+        /*
         string RunCommand(string command)
         {
             var processOutput = "";
@@ -53,11 +56,12 @@ namespace Container_Cat.Utilities
             if (result == "up") return true;
             else return false;
         }
+        */
         bool AddHost(HostAddress hostAddr)
         { 
             //validate IP first!
             //also make sure if container engine is correctly initialised
-            if (IsHostReachable(hostAddr) == true)
+            if (IsAPIAvailableAsync(hostAddr).Result == HostAddress.HostAvailability.Connected)//IsHostReachable(hostAddr) == true)
             {
                 hostAddr.SetStatus(HostAddress.HostAvailability.NotTested);
                 Hosts.Add(hostAddr);
