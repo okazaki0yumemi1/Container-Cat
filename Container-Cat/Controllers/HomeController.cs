@@ -1,12 +1,10 @@
-﻿using Container_Cat.EngineAPI;
-using Container_Cat.EngineAPI.Models;
+﻿using Container_Cat.Containers.EngineAPI.Models;
+using Container_Cat.Containers.Models;
 using Container_Cat.Models;
 using Container_Cat.Podman_libpod_API;
 using Container_Cat.Podman_libpod_API.Models;
 using Container_Cat.Utilities;
-using Container_Cat.Utilities.Linux;
 using Container_Cat.Utilities.Models;
-using Container_Cat.Utilities.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
@@ -30,6 +28,7 @@ namespace Container_Cat.Controllers
                 new HostAddress("192.168.0.104", "3375"),
                 new HostAddress("google.com", "80") 
             };
+            //Convert list of hosts in system lists here: ...
             List<SystemDataObj> dataObj = new List<SystemDataObj>();
             var tasks = Hosts.Select(async host =>
             {
@@ -39,11 +38,11 @@ namespace Container_Cat.Controllers
             });
             await Task.WhenAll(tasks);
             var DockerHosts = dataObj
-                .Where(item => item.InstalledContainerEngines == Utilities.Containers.ContainerEngine.Docker)
+                .Where(item => item.InstalledContainerEngines == ContainerEngine.Docker)
                 .Select(host => host.NetworkAddress)
                 .ToList();
             var PodmanHosts = dataObj
-                .Where(item => item.InstalledContainerEngines == Utilities.Containers.ContainerEngine.Podman)
+                .Where(item => item.InstalledContainerEngines == ContainerEngine.Podman)
                 .Select(host => host.NetworkAddress)
                 .ToList();
             SystemOperations<DockerContainer> DockerSystems = new SystemOperations<DockerContainer>(DockerHosts);

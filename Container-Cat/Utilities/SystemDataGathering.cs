@@ -6,7 +6,7 @@ using Container_Cat.Utilities.Models;
 using Container_Cat.Podman_libpod_API;
 using Container_Cat.EngineAPI;
 
-namespace Container_Cat.Utilities.Linux
+namespace Container_Cat.Utilities
 {
     public class SystemDataGathering
     {
@@ -20,7 +20,7 @@ namespace Container_Cat.Utilities.Linux
         }
         async Task<ContainerEngine> DetectApiAsync(HostAddress hostAddr)
         {
-            try 
+            try
             {
                 HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}");
                 if (response.IsSuccessStatusCode)
@@ -98,7 +98,7 @@ namespace Container_Cat.Utilities.Linux
             dataObj.InstalledContainerEngines = ContainerEngineInstalledAsync(hostAddr).Result;
             return dataObj;
         }
-        
+
         //HostSystem<T> CreateHostSystem<T>(HostAddress hostAddr) where T : BaseContainer
         //{
         //    if (IsDockerInstalled(Hosts.First()))

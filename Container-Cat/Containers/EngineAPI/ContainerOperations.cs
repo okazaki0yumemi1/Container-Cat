@@ -1,21 +1,21 @@
-﻿using Container_Cat.EngineAPI.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Container_Cat.Utilities.Containers;
 using Container_Cat.Utilities.Models.Models;
 using System.Linq.Expressions;
+using Container_Cat.Containers.EngineAPI.Models;
 
-namespace Container_Cat.EngineAPI
+namespace Container_Cat.Containers.EngineAPI
 {
     public class DockerContainerOperations : IContainerOperations<DockerContainer>
     {
-        public DockerContainerOperations(HttpClient _client, HostAddress _nAddr) 
-        { 
+        public DockerContainerOperations(HttpClient _client, HostAddress _nAddr)
+        {
             client = _client;
             networkAddr = _nAddr;
         }
         private readonly HttpClient client;
         private readonly HostAddress networkAddr;
-       
+
         //List, inspect are important to implement
         //start, stop, restart, kill - not sure if they are needed right now
 
@@ -60,7 +60,7 @@ namespace Container_Cat.EngineAPI
                 return container;
             }
 
-            
+
         }
 
         public Task<DockerContainer> GetContainerByNameAsync(string Name)

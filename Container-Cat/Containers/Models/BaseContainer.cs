@@ -1,4 +1,4 @@
-﻿namespace Container_Cat.Utilities.Containers
+﻿namespace Container_Cat.Containers.Models
 {
     public abstract class BaseContainer
     {

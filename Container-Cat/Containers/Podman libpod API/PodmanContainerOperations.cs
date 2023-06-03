@@ -1,6 +1,6 @@
-﻿using Container_Cat.Podman_libpod_API.Models;
-using Container_Cat.Utilities.Containers;
-using Container_Cat.Utilities.Models.Models;
+﻿using Container_Cat.Containers.Models;
+using Container_Cat.Podman_libpod_API.Models;
+using Container_Cat.Utilities.Models;
 
 namespace Container_Cat.Podman_libpod_API
 {

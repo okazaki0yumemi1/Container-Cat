@@ -1,4 +1,4 @@
-﻿namespace Container_Cat.Utilities.Containers
+﻿namespace Container_Cat.Containers.Models
 {
     public interface IContainerOperations<T> where T : BaseContainer
     {

@@ -1,8 +1,8 @@
-﻿using Container_Cat.Utilities.Containers;
+﻿using Container_Cat.Containers.Models;
 
-namespace Container_Cat.Utilities.Models.Models
+namespace Container_Cat.Utilities.Models
 {
-    public class HostSystem<T> : SystemDataObj where T : BaseContainer 
+    public class HostSystem<T> : SystemDataObj where T : BaseContainer
     {
         Guid Id { get; set; }
         new public HostAddress NetworkAddress { get; private set; }

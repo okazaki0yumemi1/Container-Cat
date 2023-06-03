@@ -1,5 +1,4 @@
-﻿using Container_Cat.Utilities.Containers;
-using Container_Cat.Utilities.Models.Models;
+﻿using Container_Cat.Containers.Models;
 
 namespace Container_Cat.Utilities.Models
 {
