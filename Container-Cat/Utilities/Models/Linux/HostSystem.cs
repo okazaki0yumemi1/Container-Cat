@@ -5,7 +5,7 @@ namespace Container_Cat.Utilities.Models.Models
     public class HostSystem<T> : SystemDataObj where T : BaseContainer 
     {
         Guid Id { get; set; }
-        HostAddress NetworkAddress { get; set; }
+        new HostAddress NetworkAddress { get; set; }
         List<T> Containers { get; set; }
         public ContainerEngine InstalledContainerEngine { get; private set; }
         public HostSystem(HostAddress _networkAddr)

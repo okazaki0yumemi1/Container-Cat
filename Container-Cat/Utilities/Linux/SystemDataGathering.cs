@@ -20,12 +20,9 @@ namespace Container_Cat.Utilities.Linux
         {
             try
             {
-                using HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping");
-                switch ((int)response.StatusCode)
-                {
-                    case 200: return true;
-                    default: return false;
-                }
+                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping");
+                if (response.IsSuccessStatusCode) return true;
+                else return false;
             }
             catch (Exception e)
             {
@@ -38,12 +35,9 @@ namespace Container_Cat.Utilities.Linux
         {
             try
             {
-                using HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping");
-                switch ((int)response.StatusCode)
-                {
-                    case 200: return true;
-                    default: return false;
-                }
+                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping");
+                if (response.IsSuccessStatusCode) return true;
+                else return false;
             }
             catch (Exception e)
             {

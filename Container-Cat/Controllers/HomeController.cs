@@ -25,9 +25,9 @@ namespace Container_Cat.Controllers
             SystemDataGathering dataGatherer = new SystemDataGathering();
             List<HostAddress> Hosts = new List<HostAddress>()
             {
-                new HostAddress("127.0.0.1", "3375"), 
-                new HostAddress("192.168.56.999", "3375"), 
-                new HostAddress("192.168.0.104", "3375"), 
+                new HostAddress("127.0.0.1", "2375"),
+                new HostAddress("192.168.56.99", "3375"),
+                new HostAddress("192.168.0.104", "3375"),
                 new HostAddress("google.com", "80") 
             };
             List<SystemDataObj> dataObj = new List<SystemDataObj>();

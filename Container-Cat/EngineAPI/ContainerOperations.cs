@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Container_Cat.Utilities.Containers;
 using Container_Cat.Utilities.Models.Models;
+using System.Linq.Expressions;
 
 namespace Container_Cat.EngineAPI
 {
@@ -21,38 +22,45 @@ namespace Container_Cat.EngineAPI
         public async Task<List<DockerContainer>> ListContainersAsync()
         {
             List<DockerContainer> result = new List<DockerContainer>();
-            HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetAllContainers);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var str = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<List<DockerContainer>>(str);
+                HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetAllContainers);
+                if (response.IsSuccessStatusCode)
+                {
+                    string str = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<List<DockerContainer>>(str);
+                    return result;
+                }
+                else return result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("\nException caught while testing host availability.");
+                Console.WriteLine("Message :{0} ", e.Message);
                 return result;
             }
-            else return result;
+
         }
         public async Task<DockerContainer> GetContainerByIDAsync(string Id)
         {
             DockerContainer container = new DockerContainer();
             var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetContainerByID.Replace("{id}", Id);
-            HttpResponseMessage response = await client.GetAsync(uri);
-            if (response.IsSuccessStatusCode)
+            try
             {
+                HttpResponseMessage response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 var str = await response.Content.ReadAsStringAsync();
                 container = JsonConvert.DeserializeObject<DockerContainer>(str);
                 return container;
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            catch (Exception e)
             {
-                Console.WriteLine($"Got Error 400. GET-request to: {uri}.");
-                Console.WriteLine("Returning null.");
-                return null;
+                Console.WriteLine("\nException caught while testing host availability.");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return container;
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                Console.WriteLine($"Got Error 500. GET-request to: {uri}. Is host {networkAddr.Ip}:{networkAddr.Port} okay?");
-                return null;
-            }
-            else return null;
+
+            
         }
 
         public Task<DockerContainer> GetContainerByNameAsync(string Name)
