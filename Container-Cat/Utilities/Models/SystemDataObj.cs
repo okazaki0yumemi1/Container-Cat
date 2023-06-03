@@ -5,7 +5,7 @@ namespace Container_Cat.Utilities.Models
 {
     public class SystemDataObj
     {
-        Guid Id { get; set; }
+        Guid Id;
         public HostAddress NetworkAddress { get; set; }
         public ContainerEngine InstalledContainerEngines { get; set; }
         public SystemDataObj(HostAddress _networkAddr)
