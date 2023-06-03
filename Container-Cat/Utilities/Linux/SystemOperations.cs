@@ -3,9 +3,7 @@ using Container_Cat.EngineAPI.Models;
 using Container_Cat.Podman_libpod_API;
 using Container_Cat.Podman_libpod_API.Models;
 using Container_Cat.Utilities.Containers;
-using Container_Cat.Utilities.Models;
 using Container_Cat.Utilities.Models.Models;
-using System.Diagnostics;
 
 namespace Container_Cat.Utilities
 {

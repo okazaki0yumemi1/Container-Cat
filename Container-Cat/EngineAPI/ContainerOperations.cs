@@ -14,7 +14,7 @@ namespace Container_Cat.EngineAPI
         }
         private readonly HttpClient client;
         private readonly HostAddress networkAddr;
-        private static EngineAPIEndpoints.Containers cEndpoint = new EngineAPIEndpoints.Containers() { };
+        private static DockerEngineAPI.Containers cEndpoint = new DockerEngineAPI.Containers() { };
         //List, inspect are important to implement
         //start, stop, restart, kill - not sure if they are needed right now
 

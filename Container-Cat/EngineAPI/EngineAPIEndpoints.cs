@@ -1,6 +1,6 @@
 ﻿namespace Container_Cat.EngineAPI
 {
-    public class EngineAPIEndpoints
+    public class DockerEngineAPI
     {
         public readonly string Info = "version";
         public readonly string Events = "events";
@@ -27,6 +27,6 @@
             public readonly string ListNetworks = BaseAddr;
             public readonly string GetNetworkByID = BaseAddr + "/{id}";
         }
-        public EngineAPIEndpoints() { }
+        public DockerEngineAPI() { }
     }
 }
