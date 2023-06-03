@@ -4,10 +4,12 @@ using Container_Cat.Containers.Models;
 using Container_Cat.PodmanAPI;
 using Container_Cat.PodmanAPI.Models;
 using Container_Cat.Utilities.Models;
+using Container_Cat.Utilities.Interfaces;
+using Microsoft.Extensions.Hosting;
 
 namespace Container_Cat.Utilities
 {
-    public class SystemOperations<T> where T : BaseContainer
+    public class SystemOperations<T> : IOperations<T> where T : BaseContainer
     {
         //This class is used to:
         //Add HostSystem to List<HostSystem>
@@ -17,18 +19,21 @@ namespace Container_Cat.Utilities
         //List<HostAddress> Hosts = new List<HostAddress>();
         static HttpClient client = new HttpClient();
         List<HostSystem<T>> Systems;
-        public SystemOperations(List<HostAddress> hosts)
+        public SystemOperations()
         {
-            //You have to provide HostAddress with IP and Port. 
-            //Right now I am providing IP and Port for my local VMs.
-            //Hosts = new List<HostAddress>();
             Systems = new List<HostSystem<T>>();
-            foreach (var host in hosts)
-            {
-                Systems.Add(new HostSystem<T>(host));
-                Console.WriteLine("Host was added successfully.");
-            }
         }
+        //public SystemOperations(List<HostAddress> hosts)
+        //{
+        //    //You have to provide HostAddress with IP and Port. 
+        //    //Right now I am providing IP and Port for my local VMs.
+        //    //Hosts = new List<HostAddress>();
+        //    foreach (var host in hosts)
+        //    {
+        //        Systems.Add(new HostSystem<T>(host));
+        //        Console.WriteLine("Host was added successfully.");
+        //    }
+        //}
         //The following lines should not be used because of compatibility and unnecessary code.
         //Why use bash (and then implement PowerShell and MacOS shell commands) when you can use HttpClient?
         /*
@@ -67,7 +72,7 @@ namespace Container_Cat.Utilities
             else return false;
         }
         */
-        async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
+        public async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
             try
             {
@@ -131,6 +136,26 @@ namespace Container_Cat.Utilities
                 Systems.Add(system);
             });
             await Task.WhenAll(tasks);
+            return Systems.Count;
+        }
+
+        public bool AddHostSystem(HostSystem<T> newSystem)
+        {
+            try
+            {
+                Systems.Add(new HostSystem<T>(newSystem.NetworkAddress));
+                Console.WriteLine("Host was added successfully.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nException caught while adding new host system.");
+                Console.WriteLine("Message :{0} ", ex.Message);
+                return false;
+            }
+        }
+        public int SystemsCount()
+        {
             return Systems.Count;
         }
     }

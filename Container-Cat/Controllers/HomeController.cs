@@ -19,35 +19,54 @@ namespace Container_Cat.Controllers
         public async Task<IActionResult> Index()
         {
             SystemDataGathering dataGatherer = new SystemDataGathering();
+            SystemOperations<DockerContainer> DockerSystems = new SystemOperations<DockerContainer>();
+            SystemOperations<PodmanContainer> PodmanSystems;
             List<HostAddress> Hosts = new List<HostAddress>()
             {
-                new HostAddress("127.0.0.1", "2375"),
+                new HostAddress("127.0.0.1", "3375"),
                 new HostAddress("192.168.56.99", "3375"),
                 new HostAddress("192.168.0.104", "3375"),
                 new HostAddress("google.com", "80") 
             };
-            //Convert list of hosts in system lists here: ...
-            List<SystemDataObj> dataObj = new List<SystemDataObj>();
-            var tasks = Hosts.Select(async host =>
+            await foreach (var dataObj in dataGatherer.FetchDataObjectRangeAsync(Hosts))
             {
-                SystemDataObj item = new SystemDataObj(host);
-                item.InstalledContainerEngines = await dataGatherer.ContainerEngineInstalledAsync(host);
-                dataObj.Add(item);
-            });
-            await Task.WhenAll(tasks);
-            var DockerHosts = dataObj
-                .Where(item => item.InstalledContainerEngines == ContainerEngine.Docker)
-                .Select(host => host.NetworkAddress)
-                .ToList();
-            var PodmanHosts = dataObj
-                .Where(item => item.InstalledContainerEngines == ContainerEngine.Podman)
-                .Select(host => host.NetworkAddress)
-                .ToList();
-            SystemOperations<DockerContainer> DockerSystems = new SystemOperations<DockerContainer>(DockerHosts);
-            SystemOperations<PodmanContainer> PodmanSystems = new SystemOperations<PodmanContainer>(PodmanHosts);
-            var systems = await DockerSystems.InitialiseHostSystemsAsync();
+                if (dataObj.InstalledContainerEngines == ContainerEngine.Docker)
+                {
+                    DockerSystems.AddHostSystem(new HostSystem<DockerContainer>(dataObj));
+                    Console.WriteLine($"{dataObj.NetworkAddress.Ip}:{dataObj.NetworkAddress.Port} is {dataObj.InstalledContainerEngines}.");
+                    Console.WriteLine($"There are {DockerSystems.SystemsCount()} systems with Docker.");
+                }
+                else if (dataObj.InstalledContainerEngines == ContainerEngine.Podman)
+                {
+                    throw new NotImplementedException("Podman is not implemented.");
+                } 
+            }
+            //var tasks = Hosts.Select(async host =>
+            //{
+            //    SystemDataObj item = new SystemDataObj(host);
+            //    item.InstalledContainerEngines = await dataGatherer.ContainerEngineInstalledAsync(host);
+            //    dataObj.Add(item);
+            //});
+            //await Task.WhenAll(tasks);
+            //var DockerHosts = dataObj
+            //    .Where(item => item.InstalledContainerEngines == ContainerEngine.Docker)
+            //    .Select(host => host.NetworkAddress)
+            //    .ToList();
+            //var PodmanHosts = dataObj
+            //    .Where(item => item.InstalledContainerEngines == ContainerEngine.Podman)
+            //    .Select(host => host.NetworkAddress)
+            //    .ToList();
             return View();
         }
+        //async IAsyncEnumerable<SystemDataObj> FetchDataObjectsAsync(List<HostAddress> hostAddr, SystemDataGathering gatherer)
+        //{
+        //    foreach (var host in hostAddr)
+        //    {
+        //        SystemDataObj dataObj = new SystemDataObj(host);
+        //        dataObj.InstalledContainerEngines = await gatherer.ContainerEngineInstalledAsync(host);
+        //        yield return dataObj;
+        //    }
+        //}
 
         public IActionResult Privacy()
         {

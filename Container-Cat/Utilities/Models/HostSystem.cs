@@ -8,6 +8,13 @@ namespace Container_Cat.Utilities.Models
         new public HostAddress NetworkAddress { get; private set; }
         List<T> Containers { get; set; }
         public ContainerEngine InstalledContainerEngine { get; private set; }
+        public HostSystem(SystemDataObj dataObj) 
+        {
+            Containers = new List<T>();
+            NetworkAddress = dataObj.NetworkAddress;
+            Id = Guid.NewGuid();
+            InstalledContainerEngine = dataObj.InstalledContainerEngines;
+        }
         public HostSystem(HostAddress _networkAddr)
         {
             Containers = new List<T>();

@@ -43,6 +43,15 @@ namespace Container_Cat.Utilities
                 return ContainerEngine.Unknown;
             }
         }
+        public async IAsyncEnumerable<SystemDataObj> FetchDataObjectRangeAsync(List<HostAddress> hostAddr)
+        {
+            foreach (var host in hostAddr)
+            {
+                SystemDataObj dataObj = new SystemDataObj(host);
+                dataObj.InstalledContainerEngines = await ContainerEngineInstalledAsync(host);
+                yield return dataObj;
+            }
+        }
         async Task<bool> IsDockerInstalledAsync(HostAddress hostAddr)
         {
             try
