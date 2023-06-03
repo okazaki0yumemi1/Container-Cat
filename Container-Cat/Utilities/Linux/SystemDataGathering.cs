@@ -20,8 +20,12 @@ namespace Container_Cat.Utilities.Linux
         {
             try
             {
-                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping");
-                if (response.IsSuccessStatusCode) return true;
+                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/version");
+                if (response.IsSuccessStatusCode)
+                {
+                    //Do some checks for API version
+                    return true;
+                }
                 else return false;
             }
             catch (Exception e)

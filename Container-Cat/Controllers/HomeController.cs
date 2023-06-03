@@ -48,7 +48,7 @@ namespace Container_Cat.Controllers
                 .ToList();
             SystemOperations<DockerContainer> DockerSystems = new SystemOperations<DockerContainer>(DockerHosts);
             SystemOperations<PodmanContainer> PodmanSystems = new SystemOperations<PodmanContainer>(PodmanHosts);
-            var systems = DockerSystems.GetHostSystems();
+            var systems = await DockerSystems.InitialiseHostSystemsAsync();
             return View();
         }
 

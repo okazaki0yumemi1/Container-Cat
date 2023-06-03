@@ -14,19 +14,19 @@ namespace Container_Cat.Utilities
         //Determine if HostSystem contains any container engines
         //...
         //Think of it as a tool to populate HostSystem entity with data.
-        static List<HostAddress> Hosts = new List<HostAddress>();
+        //List<HostAddress> Hosts = new List<HostAddress>();
         static HttpClient client = new HttpClient();
         List<HostSystem<T>> Systems;
         public SystemOperations(List<HostAddress> hosts)
         {
             //You have to provide HostAddress with IP and Port. 
             //Right now I am providing IP and Port for my local VMs.
-            Hosts = new List<HostAddress>();
+            //Hosts = new List<HostAddress>();
             Systems = new List<HostSystem<T>>();
-            foreach (var testHost in hosts)
+            foreach (var host in hosts)
             {
-                if(AddHost(testHost)) Console.WriteLine("Host was added successfully.");
-                else Console.WriteLine("Unable to add host.");
+                Systems.Add(new HostSystem<T>(host));
+                Console.WriteLine("Host was added successfully.");
             }
         }
         //The following lines should not be used because of compatibility and unnecessary code.
@@ -54,19 +54,19 @@ namespace Container_Cat.Utilities
             if (result == "up") return true;
             else return false;
         }
-        */
+        
         bool AddHost(HostAddress hostAddr)
         { 
             //validate IP first!
             //also make sure if container engine is correctly initialised
             if (IsAPIAvailableAsync(hostAddr).Result == HostAddress.HostAvailability.Connected)//IsHostReachable(hostAddr) == true)
             {
-                hostAddr.SetStatus(HostAddress.HostAvailability.NotTested);
                 Hosts.Add(hostAddr);
                 return true;
             }
             else return false;
         }
+        */
         async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
             try
@@ -79,7 +79,7 @@ namespace Container_Cat.Utilities
                     default: return HostAddress.HostAvailability.Unreachable;
                 }
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 Console.WriteLine("\nException caught while testing host availability.");
                 Console.WriteLine("Message :{0} ", e.Message);
@@ -96,6 +96,7 @@ namespace Container_Cat.Utilities
          */
         public async Task<int> InitialiseHostSystemsAsync()
         {
+            List<HostAddress> Hosts = new List<HostAddress>();
             var tasks = Systems.Select(async system =>
             {
                 var probe = await IsAPIAvailableAsync(system.NetworkAddress);
