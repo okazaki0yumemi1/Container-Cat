@@ -1,4 +1,4 @@
-﻿namespace Container_Cat.Podman_libpod_API
+﻿namespace Container_Cat.Containers.ApiRoutes
 {
     public class PodmanApiEndpoints
     {
