@@ -32,6 +32,7 @@ namespace Container_Cat.EngineAPI
         }
         public async Task<DockerContainer> GetContainerByIDAsync(string Id)
         {
+            DockerContainer container = new DockerContainer();
             var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetContainerByID.Replace("{id}", Id);
             HttpResponseMessage response = await client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
