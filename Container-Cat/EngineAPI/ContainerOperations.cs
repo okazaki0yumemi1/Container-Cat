@@ -15,7 +15,7 @@ namespace Container_Cat.EngineAPI
         }
         private readonly HttpClient client;
         private readonly HostAddress networkAddr;
-        private readonly DockerEngineAPI.Containers cEndpoint = new DockerEngineAPI.Containers() { };
+       
         //List, inspect are important to implement
         //start, stop, restart, kill - not sure if they are needed right now
 
@@ -24,7 +24,7 @@ namespace Container_Cat.EngineAPI
             List<DockerContainer> result = new List<DockerContainer>();
             try
             {
-                HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetAllContainers);
+                HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + DockerEngineAPIEndpoints.Containers.GetAllContainers);
                 if (response.IsSuccessStatusCode)
                 {
                     string str = await response.Content.ReadAsStringAsync();
@@ -44,7 +44,7 @@ namespace Container_Cat.EngineAPI
         public async Task<DockerContainer> GetContainerByIDAsync(string Id)
         {
             DockerContainer container = new DockerContainer();
-            var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + cEndpoint.GetContainerByID.Replace("{id}", Id);
+            var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + DockerEngineAPIEndpoints.Containers.GetContainerByID.Replace("{id}", Id);
             try
             {
                 HttpResponseMessage response = await client.GetAsync(uri);

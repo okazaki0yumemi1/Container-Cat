@@ -3,6 +3,8 @@ using Container_Cat.Utilities.Containers;
 using Container_Cat.Podman_libpod_API.Models;
 using Container_Cat.Utilities.Models.Models;
 using Container_Cat.Utilities.Models;
+using Container_Cat.Podman_libpod_API;
+using Container_Cat.EngineAPI;
 
 namespace Container_Cat.Utilities.Linux
 {
@@ -15,6 +17,36 @@ namespace Container_Cat.Utilities.Linux
             client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(20);
             //hostAddr = _hostAddr;
+        }
+        async Task<ContainerEngine> DetectApiAsync(HostAddress hostAddr)
+        {
+            try 
+            {
+                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return ContainerEngine.Docker;
+                }
+                else if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
+                {
+                    //response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/{DockerEngineAPIEndpoints.Info}");
+                    //This is just for testing:
+                    response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/info");
+                    response.EnsureSuccessStatusCode();
+                    return ContainerEngine.Podman;
+                }
+                else
+                {
+                    NotImplementedException e = new NotImplementedException("Unable to identify container engine from response body.");
+                    throw e;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nException caught while checking container engine type.");
+                Console.WriteLine("Message :{0} ", ex.Message);
+                return ContainerEngine.Unknown;
+            }
         }
         async Task<bool> IsDockerInstalledAsync(HostAddress hostAddr)
         {
@@ -53,11 +85,12 @@ namespace Container_Cat.Utilities.Linux
         public async Task<ContainerEngine> ContainerEngineInstalledAsync(HostAddress hostAddress)
         {
             //This should and will be changed to a cleanier version
-            var dockerCheck = await IsDockerInstalledAsync(hostAddress);
-            var podmanCheck = await IsPodmanInstalledAsync(hostAddress);
-            if (dockerCheck == true) return ContainerEngine.Docker;
-            else if (podmanCheck == true) return ContainerEngine.Podman;
-            else return ContainerEngine.Unknown;
+            //var dockerCheck = await IsDockerInstalledAsync(hostAddress);
+            //var podmanCheck = await IsPodmanInstalledAsync(hostAddress);
+            //if (dockerCheck == true) return ContainerEngine.Docker;
+            //else if (podmanCheck == true) return ContainerEngine.Podman;
+            var apiType = await DetectApiAsync(hostAddress);
+            return apiType;
         }
         public SystemDataObj ReturnHostSystemData(HostAddress hostAddr)
         {

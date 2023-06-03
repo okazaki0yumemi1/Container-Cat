@@ -1,32 +1,31 @@
 ﻿namespace Container_Cat.EngineAPI
 {
-    public class DockerEngineAPI
+    public static class DockerEngineAPIEndpoints
     {
-        public readonly string Info = "version";
-        public readonly string Events = "events";
+        public const string Version = "version";
+        public const string Events = "events";
         public class Containers
         {
-            static readonly string BaseAddr = "containers";
-            public readonly string GetAllContainers = BaseAddr + "/json";
-            public readonly string GetContainerByID = BaseAddr + "/{id}/json";
-            public readonly string GetContainerStats = BaseAddr + "/{id}/stats";
-            public readonly string StartContainer = BaseAddr + "/{id}/start";
-            public readonly string StopContainer = BaseAddr + "/{id}/stop";
-            public readonly string RestartContainer = BaseAddr + "/{id}/restart";
+            public const string BaseAddr = "containers";
+            public const string GetAllContainers = BaseAddr + "/json";
+            public const string GetContainerByID = BaseAddr + "/{id}/json";
+            public const string GetContainerStats = BaseAddr + "/{id}/stats";
+            public const string StartContainer = BaseAddr + "/{id}/start";
+            public const string StopContainer = BaseAddr + "/{id}/stop";
+            public const string RestartContainer = BaseAddr + "/{id}/restart";
             public Containers() { }
         }
         public class Images
         {
-            static readonly string BaseAddr = "images";
-            public readonly string ListImages = BaseAddr + "/json";
-            public readonly string GetImageByName = BaseAddr + "/{name}/json";
+            public const string BaseAddr = "images";
+            public const string ListImages = BaseAddr + "/json";
+            public const string GetImageByName = BaseAddr + "/{name}/json";
         }
         public class Networks
         {
-            static readonly string BaseAddr = "networks";
-            public readonly string ListNetworks = BaseAddr;
-            public readonly string GetNetworkByID = BaseAddr + "/{id}";
+            public const string BaseAddr = "networks";
+            public const string ListNetworks = BaseAddr;
+            public const string GetNetworkByID = BaseAddr + "/{id}";
         }
-        public DockerEngineAPI() { }
     }
 }
