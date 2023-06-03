@@ -1,8 +1,8 @@
 ﻿using Container_Cat.Containers.Models;
-using Container_Cat.Podman_libpod_API.Models;
+using Container_Cat.PodmanAPI.Models;
 using Container_Cat.Utilities.Models;
 
-namespace Container_Cat.Podman_libpod_API
+namespace Container_Cat.PodmanAPI
 {
     public class PodmanContainerOperations : IContainerOperations<PodmanContainer>
     {

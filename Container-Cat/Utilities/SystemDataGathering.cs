@@ -12,7 +12,6 @@ namespace Container_Cat.Utilities
         {
             client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(20);
-            //hostAddr = _hostAddr;
         }
         async Task<ContainerEngine> DetectApiAsync(HostAddress hostAddr)
         {

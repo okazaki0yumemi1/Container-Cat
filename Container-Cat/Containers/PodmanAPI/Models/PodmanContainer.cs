@@ -1,6 +1,6 @@
 ﻿using Container_Cat.Containers.Models;
 
-namespace Container_Cat.Podman_libpod_API.Models
+namespace Container_Cat.PodmanAPI.Models
 {
     public class PodmanContainer : BaseContainer
     {
