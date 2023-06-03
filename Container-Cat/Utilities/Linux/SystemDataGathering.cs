@@ -13,13 +13,14 @@ namespace Container_Cat.Utilities.Linux
         public SystemDataGathering()//HttpClient _client)//, HostAddress _hostAddr)
         {
             client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(20);
             //hostAddr = _hostAddr;
         }
-        bool IsDockerInstalled(HostAddress hostAddr)
+        async Task<bool> IsDockerInstalledAsync(HostAddress hostAddr)
         {
             try
             {
-                using HttpResponseMessage response = client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping").Result;
+                using HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/ping");
                 switch ((int)response.StatusCode)
                 {
                     case 200: return true;
@@ -33,11 +34,11 @@ namespace Container_Cat.Utilities.Linux
                 return false;
             }
         }
-        bool IsPodmanInstalled(HostAddress hostAddr)
+        async Task<bool> IsPodmanInstalledAsync(HostAddress hostAddr)
         {
             try
             {
-                using HttpResponseMessage response = client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping").Result;
+                using HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping");
                 switch ((int)response.StatusCode)
                 {
                     case 200: return true;
@@ -51,16 +52,19 @@ namespace Container_Cat.Utilities.Linux
                 return false;
             }
         }
-        public ContainerEngine ContainerEngineInstalled(HostAddress hostAddress)
+        public async Task<ContainerEngine> ContainerEngineInstalledAsync(HostAddress hostAddress)
         {
-            if (IsDockerInstalled(hostAddress)) return ContainerEngine.Docker;
-            else if (IsPodmanInstalled(hostAddress)) return ContainerEngine.Podman;
+            //This should and will be changed to a cleanier version
+            var dockerCheck = await IsDockerInstalledAsync(hostAddress);
+            var podmanCheck = await IsPodmanInstalledAsync(hostAddress);
+            if (dockerCheck == true) return ContainerEngine.Docker;
+            else if (podmanCheck == true) return ContainerEngine.Podman;
             else return ContainerEngine.Unknown;
         }
         public SystemDataObj ReturnHostSystemData(HostAddress hostAddr)
         {
             SystemDataObj dataObj = new SystemDataObj(hostAddr);
-            dataObj.InstalledContainerEngines = ContainerEngineInstalled(hostAddr);
+            dataObj.InstalledContainerEngines = ContainerEngineInstalledAsync(hostAddr).Result;
             return dataObj;
         }
         
