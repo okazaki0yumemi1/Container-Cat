@@ -33,7 +33,7 @@
             }
             */
         }
-        public string Port
+        public string? Port
         {
             get; set;
             /*
@@ -54,6 +54,12 @@
         {
             Ip = _ip;
             Port = _port;
+            Availability = HostAvailability.NotTested;
+        }
+        public HostAddress(string _ip)
+        {
+            Ip = _ip;
+            Port = "";
             Availability = HostAvailability.NotTested;
         }
         public void SetStatus(HostAvailability _status)

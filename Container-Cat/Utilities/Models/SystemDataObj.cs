@@ -12,6 +12,12 @@ namespace Container_Cat.Utilities.Models
             NetworkAddress = _networkAddr;
             NetworkAddress.SetStatus(HostAddress.HostAvailability.NotTested);
         }
-        public SystemDataObj() { }
+        public SystemDataObj() 
+        { 
+            NetworkAddress.Ip = "127.0.0.1";
+            NetworkAddress.Port = "2375";
+            NetworkAddress.SetStatus(HostAddress.HostAvailability.NotTested);
+            InstalledContainerEngines = ContainerEngine.Unknown;
+        }
     }
 }

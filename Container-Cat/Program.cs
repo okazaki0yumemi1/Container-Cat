@@ -17,6 +17,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//dotnet aspnet-codegenerator controller -name HostsController -m HostAvailability -dc ContainerCatContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries --databaseProvider sqlite
+
 //Parse appsettings.json:
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
