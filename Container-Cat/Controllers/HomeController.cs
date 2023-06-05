@@ -58,15 +58,6 @@ namespace Container_Cat.Controllers
             //    .ToList();
             return View();
         }
-        //async IAsyncEnumerable<SystemDataObj> FetchDataObjectsAsync(List<HostAddress> hostAddr, SystemDataGathering gatherer)
-        //{
-        //    foreach (var host in hostAddr)
-        //    {
-        //        SystemDataObj dataObj = new SystemDataObj(host);
-        //        dataObj.InstalledContainerEngines = await gatherer.ContainerEngineInstalledAsync(host);
-        //        yield return dataObj;
-        //    }
-        //}
 
         public IActionResult Privacy()
         {
