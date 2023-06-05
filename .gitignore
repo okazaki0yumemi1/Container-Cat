@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /Container-Cat/Migrations
 /Container-Cat/TestDB.db
+/Container-Cat/TestDB.db-shm
+/Container-Cat/TestDB.db-wal

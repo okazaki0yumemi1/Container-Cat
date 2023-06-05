@@ -2,6 +2,7 @@
 {
     public class HostAddress
     {
+        public Guid Id { get; set; }
         public enum HostAvailability
         {
             Unreachable,
