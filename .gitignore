@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Container-Cat/TestDB.db
 /Container-Cat/TestDB.db-shm
 /Container-Cat/TestDB.db-wal
+/Container-Cat/Data/SQlLiteDatabase.db

@@ -6,7 +6,7 @@ using Container_Cat.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ContainerCatContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteTestConnection") ?? throw new InvalidOperationException("Connection string 'ContainerCatContext' not found.")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("ContainerCatDb") ?? throw new InvalidOperationException("Connection string 'ContainerCatContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
