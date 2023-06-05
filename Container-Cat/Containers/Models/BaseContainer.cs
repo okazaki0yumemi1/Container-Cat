@@ -8,7 +8,7 @@ namespace Container_Cat.Containers.Models
         [Key]
         public string Id { get; set; }
         public string State { get; set; }
-        public List<string> Names { get; set; }
+        public string Name { get; set; }
         public string Image { get; set; }
         public List<Port> Ports { get; set; }
         public List<Mount> Mounts { get; set; }
