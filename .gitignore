@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /Container-Cat/Data/SQlLiteDatabase.db
 /Container-Cat/Data/SQlLiteDatabase.db-shm
 /Container-Cat/Data/SQlLiteDatabase.db-wal
+/Container-Cat/Controllers/BaseContainersController.cs
