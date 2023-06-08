@@ -1,5 +1,5 @@
 ﻿@using Container_Cat.Containers.Models;
-@model IEnumerable<Container_Cat.Utilities.Models.HostSystem<BaseContainer>>
+@model IEnumerable<Container_Cat.Utilities.Models.SystemDataObj>;
 
 @{
     ViewData["Title"] = "Index";
@@ -14,7 +14,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                @Html.DisplayName("Host Systems");
             </th>
             <th></th>
         </tr>
@@ -23,7 +23,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Id, item.NetworkAddress.Ip)
+                @Html.DisplayFor(modelItem => item.NetworkAddress.Ip, "||", "item.Containers.Count"+" "+"containers installed")
                 @foreach (var container in item.Containers)
                 {
                     @Html.DisplayFor(modelContainer => container.State, container.Name, container.Image)        

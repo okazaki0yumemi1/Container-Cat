@@ -1,4 +1,6 @@
 ﻿using Container_Cat.Containers.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Container_Cat.Containers.EngineAPI.Models
 {
@@ -9,6 +11,7 @@ namespace Container_Cat.Containers.EngineAPI.Models
     //    public DockerContainer() { }
     public class DockerContainer : BaseContainer
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         public string[] Names { get; set; }
         public string Image { get; set; }
@@ -71,6 +74,8 @@ namespace Container_Cat.Containers.EngineAPI.Models
     }
     public class Mount
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Id { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
         public string Destination { get; set; }

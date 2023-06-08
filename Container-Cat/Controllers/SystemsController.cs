@@ -30,9 +30,12 @@ namespace Container_Cat.Controllers
         // GET: Systems
         public async Task<IActionResult> Index()
         {
-              return _context.SystemDataObj != null ? 
-                          View(await _context.SystemDataObj.ToListAsync()) :
-                          Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
+            if (_context.SystemDataObj != null)
+            {
+                var results = await _context.SystemDataObj.Include(host => host.Containers).ToListAsync();
+                return View(results);
+            }
+            else return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
         }
 
         // GET: Systems/Details/5
