@@ -1,4 +1,7 @@
-﻿namespace Container_Cat.Utilities.Models
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System.Text.RegularExpressions;
+
+namespace Container_Cat.Utilities.Models
 {
     public class HostAddress
     {
@@ -11,9 +14,22 @@
             NotTested
         }
         public HostAvailability Availability { get; set; }
+        private string hostname = "";
         public string Ip
         {
-            get; set;
+            get 
+            { 
+                return hostname; 
+            }
+            set 
+            { 
+                if (value == null || value.Length < 1)
+                {
+                    Console.WriteLine("Null or empty value of Hostname.Ip passed.");
+                    hostname = "";
+                }
+                else hostname = value; 
+            }
             /*
             get { return Ip; }
             set
@@ -53,16 +69,19 @@
         }
         public HostAddress(string _ip, string _port)
         {
+            Id = Guid.NewGuid();
             Ip = _ip;
-            Port = _port;
+            Port = ":" + _port;
             Availability = HostAvailability.NotTested;
         }
         public HostAddress(string _ip)
         {
-            Ip = _ip;
+            Id = Guid.NewGuid();
             Port = "";
+            Ip = _ip;
             Availability = HostAvailability.NotTested;
         }
+        public HostAddress() { }
         public void SetStatus(HostAvailability _status)
         {
             Availability = _status;

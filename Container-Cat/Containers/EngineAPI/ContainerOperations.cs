@@ -25,7 +25,7 @@ namespace Container_Cat.Containers.EngineAPI
             List<DockerContainer> result = new List<DockerContainer>();
             try
             {
-                HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}:{networkAddr.Port}/" + DockerEngineAPIEndpoints.Containers.GetAllContainers);
+                HttpResponseMessage response = await client.GetAsync($"http://{networkAddr.Ip}{networkAddr.Port}/" + DockerEngineAPIEndpoints.Containers.GetAllContainers);
                 if (response.IsSuccessStatusCode)
                 {
                     string str = await response.Content.ReadAsStringAsync();
@@ -45,7 +45,7 @@ namespace Container_Cat.Containers.EngineAPI
         public async Task<DockerContainer> GetContainerByIDAsync(string Id)
         {
             DockerContainer container = new DockerContainer();
-            var uri = $"http://{networkAddr.Ip}:{networkAddr.Port}/" + DockerEngineAPIEndpoints.Containers.GetContainerByID.Replace("{id}", Id);
+            var uri = $"http://{networkAddr.Ip}{networkAddr.Port}/" + DockerEngineAPIEndpoints.Containers.GetContainerByID.Replace("{id}", Id);
             try
             {
                 HttpResponseMessage response = await client.GetAsync(uri);
@@ -63,7 +63,6 @@ namespace Container_Cat.Containers.EngineAPI
 
 
         }
-
         public Task<DockerContainer> GetContainerByNameAsync(string Name)
         {
             throw new NotImplementedException();

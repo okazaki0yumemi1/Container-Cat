@@ -1,32 +1,35 @@
 ﻿using Container_Cat.Utilities.Models;
 using Container_Cat.Containers.Models;
 using Container_Cat.Containers.ApiRoutes;
+using Container_Cat.Containers.EngineAPI.Models;
+using Container_Cat.Containers.EngineAPI;
+using Microsoft.CodeAnalysis.Host.Mef;
 
 namespace Container_Cat.Utilities
 {
     public class SystemDataGathering
     {
         //public HostAddress hostAddr;
-        HttpClient client;
-        public SystemDataGathering()//HttpClient _client)//, HostAddress _hostAddr)
+        private readonly HttpClient _client;
+        public SystemDataGathering(HttpClient client)//, HostAddress _hostAddr)
         {
-            client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(20);
+            _client = client;
+            _client.Timeout = TimeSpan.FromSeconds(20);
         }
         async Task<ContainerEngine> DetectApiAsync(HostAddress hostAddr)
         {
             try
             {
-                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}");
+                HttpResponseMessage response = await _client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}");
                 if (response.IsSuccessStatusCode)
                 {
                     return ContainerEngine.Docker;
                 }
                 else if (response.StatusCode is System.Net.HttpStatusCode.NotFound)
                 {
-                    //response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/{DockerEngineAPIEndpoints.Info}");
+                    //response = await client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Info}");
                     //This is just for testing:
-                    response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/info");
+                    response = await _client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/libpod/info");
                     response.EnsureSuccessStatusCode();
                     return ContainerEngine.Podman;
                 }
@@ -43,77 +46,92 @@ namespace Container_Cat.Utilities
                 return ContainerEngine.Unknown;
             }
         }
-        public async IAsyncEnumerable<SystemDataObj> FetchDataObjectRangeAsync(List<HostAddress> hostAddr)
-        {
-            foreach (var host in hostAddr)
-            {
-                SystemDataObj dataObj = new SystemDataObj(host);
-                dataObj.InstalledContainerEngines = await ContainerEngineInstalledAsync(host);
-                yield return dataObj;
-            }
-        }
-        async Task<bool> IsDockerInstalledAsync(HostAddress hostAddr)
-        {
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/version");
-                if (response.IsSuccessStatusCode)
-                {
-                    //Do some checks for API version
-                    return true;
-                }
-                else return false;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("\nException caught while testing host availability.");
-                Console.WriteLine("Message :{0} ", e.Message);
-                return false;
-            }
-        }
-        async Task<bool> IsPodmanInstalledAsync(HostAddress hostAddr)
-        {
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}:{hostAddr.Port}/libpod/_ping");
-                if (response.IsSuccessStatusCode) return true;
-                else return false;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("\nException caught while testing host availability.");
-                Console.WriteLine("Message :{0} ", e.Message);
-                return false;
-            }
-        }
+        //public async IAsyncEnumerable<SystemDataObj> FetchDataObjectRangeAsync(List<HostAddress> hostAddr)
+        //{
+        //    foreach (var host in hostAddr)
+        //    {
+        //        SystemDataObj dataObj = new SystemDataObj(host);
+        //        dataObj.InstalledContainerEngine = await ContainerEngineInstalledAsync(host);
+        //        yield return dataObj;
+        //    }
+        //}
+        //async Task<bool> IsDockerInstalledAsync(HostAddress hostAddr)
+        //{
+        //    try
+        //    {
+        //        HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/version");
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            //Do some checks for API version
+        //            return true;
+        //        }
+        //        else return false;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("\nException caught while testing host availability.");
+        //        Console.WriteLine("Message :{0} ", e.Message);
+        //        return false;
+        //    }
+        //}
+        //async Task<bool> IsPodmanInstalledAsync(HostAddress hostAddr)
+        //{
+        //    try
+        //    {
+        //        HttpResponseMessage response = await client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/libpod/_ping");
+        //        if (response.IsSuccessStatusCode) return true;
+        //        else return false;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("\nException caught while testing host availability.");
+        //        Console.WriteLine("Message :{0} ", e.Message);
+        //        return false;
+        //    }
+        //}
         public async Task<ContainerEngine> ContainerEngineInstalledAsync(HostAddress hostAddress)
         {
-            //This should and will be changed to a cleanier version
-            //var dockerCheck = await IsDockerInstalledAsync(hostAddress);
-            //var podmanCheck = await IsPodmanInstalledAsync(hostAddress);
-            //if (dockerCheck == true) return ContainerEngine.Docker;
-            //else if (podmanCheck == true) return ContainerEngine.Podman;
             var apiType = await DetectApiAsync(hostAddress);
             return apiType;
         }
-        public SystemDataObj ReturnHostSystemData(HostAddress hostAddr)
+        public async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
-            SystemDataObj dataObj = new SystemDataObj(hostAddr);
-            dataObj.InstalledContainerEngines = ContainerEngineInstalledAsync(hostAddr).Result;
-            return dataObj;
+            try
+            {
+                using HttpResponseMessage response = await _client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/info");
+                switch ((int)response.StatusCode)
+                {
+                    case 200: return HostAddress.HostAvailability.Connected;
+                    case >= 400 and < 500: return HostAddress.HostAvailability.Unreachable;
+                    default: return HostAddress.HostAvailability.Unreachable;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("\nException caught while testing host availability.");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return HostAddress.HostAvailability.NotTested;
+            }
         }
-
-        //HostSystem<T> CreateHostSystem<T>(HostAddress hostAddr) where T : BaseContainer
-        //{
-        //    if (IsDockerInstalled(Hosts.First()))
-        //    {
-        //        HostSystem<DockerContainer> box = new HostSystem<DockerContainer>(Hosts.First());
-        //        return box;
-        //    }
-        //    else if (IsPodmanInstalled(Hosts.First()))
-        //    {
-        //        HostSystem<PodmanContainer> crate = new HostSystem<PodmanContainer>(Hosts.First());
-        //    }
-        //}
+        public async Task<List<DockerContainer>> GetContainersAsync(HostSystem<DockerContainer> dockerHost)
+        {
+            var probe = await IsAPIAvailableAsync(dockerHost.NetworkAddress);
+            if (probe == HostAddress.HostAvailability.Connected)
+            {
+                dockerHost.NetworkAddress.SetStatus(HostAddress.HostAvailability.Connected);
+                DockerContainerOperations cOps = new DockerContainerOperations(_client, dockerHost.NetworkAddress);
+                var containers = await cOps.ListContainersAsync();
+                if (containers.Count == 0)
+                {
+                    Console.WriteLine($"Failed to get container list for {dockerHost.NetworkAddress.Ip}{dockerHost.NetworkAddress.Port}, empty container will be added.");
+                    return (new List<DockerContainer>());
+                }
+                else
+                {
+                    return containers;
+                }
+            }
+            else return (new List<DockerContainer>());
+        }
     }
 }

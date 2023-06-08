@@ -2,7 +2,8 @@
   "dependencies": {
     "sqlite1": {
       "type": "sqlite",
-      "connectionId": "ConnectionStrings:ContainerCatDb"
+      "connectionId": "ConnectionStrings:ContainerCatContext",
+      "dynamicId": null
     }
   }
 }
