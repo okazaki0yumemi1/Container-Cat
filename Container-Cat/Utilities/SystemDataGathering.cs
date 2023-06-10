@@ -9,7 +9,6 @@ namespace Container_Cat.Utilities
 {
     public class SystemDataGathering
     {
-        //public HostAddress hostAddr;
         private readonly HttpClient _client;
         public SystemDataGathering(HttpClient client)//, HostAddress _hostAddr)
         {

@@ -16,10 +16,6 @@ namespace Container_Cat.Containers.EngineAPI
         }
         private readonly HttpClient client;
         private readonly HostAddress networkAddr;
-
-        //List, inspect are important to implement
-        //start, stop, restart, kill - not sure if they are needed right now
-
         public async Task<List<DockerContainer>> ListContainersAsync()
         {
             List<DockerContainer> result = new List<DockerContainer>();
@@ -60,8 +56,6 @@ namespace Container_Cat.Containers.EngineAPI
                 Console.WriteLine("Message :{0} ", e.Message);
                 return container;
             }
-
-
         }
         public Task<DockerContainer> GetContainerByNameAsync(string Name)
         {

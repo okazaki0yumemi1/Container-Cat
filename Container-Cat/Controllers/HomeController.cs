@@ -18,21 +18,6 @@ namespace Container_Cat.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            //var tasks = Hosts.Select(async host =>
-            //{
-            //    SystemDataObj item = new SystemDataObj(host);
-            //    item.InstalledContainerEngines = await dataGatherer.ContainerEngineInstalledAsync(host);
-            //    dataObj.Add(item);
-            //});
-            //await Task.WhenAll(tasks);
-            //var DockerHosts = dataObj
-            //    .Where(item => item.InstalledContainerEngines == ContainerEngine.Docker)
-            //    .Select(host => host.NetworkAddress)
-            //    .ToList();
-            //var PodmanHosts = dataObj
-            //    .Where(item => item.InstalledContainerEngines == ContainerEngine.Podman)
-            //    .Select(host => host.NetworkAddress)
-            //    .ToList();
             return View();
         }
 

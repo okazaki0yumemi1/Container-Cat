@@ -1,4 +1,5 @@
-﻿@model Container_Cat.Utilities.Models.SystemDataObj
+﻿@using Container_Cat.Containers.EngineAPI;
+@model Container_Cat.Utilities.Models.SystemDataObj
 
 @{
     ViewData["Title"] = "Details";
@@ -6,18 +7,56 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>SystemDataObj</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.InstalledContainerEngine)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.InstalledContainerEngine)
-        </dd>
-    </dl>
-</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                            @Html.DisplayText("Container state");
+            </th>
+            <th>
+                            @Html.DisplayText("Container name");
+            </th>
+            <th>
+                            @Html.DisplayText("Container Id");
+            </th>
+            <th>
+                            @Html.DisplayText("Container image");
+            </th>
+            <th>
+                            @Html.DisplayText("Container network address");
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (var item in Model.Containers)
+            {
+            <tr>
+                <td>
+                                @Html.DisplayFor(modelItem => item.State)
+                </td>
+                <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                                @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                                @Html.DisplayFor(modelItem => item.Image)
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        <tbody>
+                                @foreach (var portObj in item.Ports)
+                                        {
+                                         <li>@portObj;</li>
+                                        }
+                        </tbody>
+                </td>
+            </tr>
+                    }
+    </tbody>
+</table>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

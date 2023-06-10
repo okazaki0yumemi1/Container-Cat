@@ -19,14 +19,11 @@ namespace Container_Cat.Utilities.Models
         public SystemDataObj() 
         {
             Id = Guid.NewGuid();
-            //NetworkAddress.Ip = "127.0.0.1";
-            //NetworkAddress.Port = "2375";
             NetworkAddress.Availability = HostAddress.HostAvailability.NotTested;
             InstalledContainerEngine = ContainerEngine.Unknown;
         }
         public void AddBaseContainers(List<DockerContainer> containers)
         {
-            //List<BaseContainer> result = new List<BaseContainer>();
             foreach (var dockerContainer in containers) 
             { 
                 BaseContainer container = new BaseContainer();
@@ -54,7 +51,6 @@ namespace Container_Cat.Utilities.Models
                 }
                 Containers.Add(container);
             }
-            //return result;
         }
     }
 }

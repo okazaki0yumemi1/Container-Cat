@@ -46,13 +46,11 @@ namespace Container_Cat.Controllers
                 return NotFound();
             }
 
-            var systemDataObj = await _context.SystemDataObj
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var systemDataObj = await _context.SystemDataObj.Include(host => host.Containers).FirstOrDefaultAsync(m => m.Id == id);
             if (systemDataObj == null)
             {
                 return NotFound();
             }
-
             return View(systemDataObj);
         }
 
@@ -73,15 +71,15 @@ namespace Container_Cat.Controllers
             SystemDataObj systemDataObj = new SystemDataObj(host);
             if (ModelState.IsValid)
             {
-                //_context.Add(systemDataObj);
                 HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
-                //await _context.SaveChangesAsync();
                 if (systemObj.InstalledContainerEngine != ContainerEngine.Unknown)
                 {
                     //Get containers as BaseContainer:
                     HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
                     var containers = await _dataGatherer.GetContainersAsync(dockerHost);
                     systemDataObj.AddBaseContainers(containers);
+                    //Change two lines above to this later:
+                    //systemDataObj.AddBaseContainers(await _dataGatherer.GetContainersAsync(dockerHost));
                     _context.Add(systemDataObj);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
