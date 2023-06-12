@@ -8,7 +8,7 @@ namespace Container_Cat.Utilities.Models
     {
         public Guid Id { get; private set; }
         public HostAddress NetworkAddress { get; set; } = new HostAddress();
-        public ContainerEngine InstalledContainerEngine { get; set; } = new ContainerEngine();
+        public ContainerEngine InstalledContainerEngine { get; set; } = ContainerEngine.Unknown;
         public List<BaseContainer> Containers { get; set; } = new List<BaseContainer>();
         public SystemDataObj(HostAddress _networkAddr)
         {
