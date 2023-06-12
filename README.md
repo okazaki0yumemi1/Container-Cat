@@ -1,16 +1,22 @@
-# Container-Cat
-Цель проекта - dashboard, которая "умеет" работать на ARM и x86_64, с Docker и Podman. 
-Пока что реализовано:
-1. Превращение полученного на вход списка IP:Port в объект HostAddress и дальнейшее создание списка HostSystems (модель, содержащая данные о хосте: ОС, данные о сети, контейнеры...)
-2. Инициализация объекта HostSystem: опрос хоста (на предмет доступности), подключение и работа с Docker Engine API.
-3. Обработка ответа: получение данных о контейнерах на хосте (трансформация полученного JSON в List<DockerContainer>) с обработкой очевидных ошибок.
-  
-В данный момент пока не очень понятно:
-1. В какой форме реализовывать persistent storage: MongoDB + PostgreSQL? 
-2. Стоит ли добавлять управление контейнерами на удалённых хостах?
+# Container-Cat 
 
-В ближайшее время буду добавлять:
-1. Вывод хоть каких-то данных на frontend (статус контейнеров у хоста как минимум, список контейнеров, список хостов...) через DTO.
-2. Работа с TLS и подключением к Engine API по HTTPS (потому что надо защищать API обязательно).
+This is a sample project made mostly for fun and experience (not only coding, but Docker and Podman too!), so feel free to give me any feedback on my code quality. :)
+
+  The main goal was to create a dashboard for various container host machines (both virtual and bare metal). App tries to get info from URI and, if the response is correct, parses it to 
+SystemDataObject (network info, container engine info, status...). Then it gets joined with List<BaseContainer>, which is a basic container info (such as Ports, Mounts, container Id, Status, Image Id), and goes into database. The front-end part is a work in progress, and I have no idea how to code a front-end, so expect horrible results.
   
-(=ↀωↀ=)
+  Right now paths:
+  `/systems/`
+  `/systems/create`
+  `/systems/delete/{id}`
+  `/systems/details/{id}`
+  works, as well as database CRUD operations.
+  
+  My main focuses are:
+  - Ddd an option to return JSON obj to a front-end 
+  - Code cleanup
+  - Unit tests
+  - Documentation
+  - Release and installation instructions
+
+  (=ↀωↀ=)
