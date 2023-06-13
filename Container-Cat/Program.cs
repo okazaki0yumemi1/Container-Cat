@@ -6,7 +6,7 @@ using Container_Cat.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ContainerCatContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("ContainerCatDb") ?? throw new InvalidOperationException("Connection string 'ContainerCatContext' not found.")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("ContainerCatContext") ?? throw new InvalidOperationException("Connection string 'ContainerCatContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -22,8 +22,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-//dotnet aspnet-codegenerator controller -name HostsController -m HostAvailability -dc ContainerCatContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries --databaseProvider sqlite
-
 //Parse appsettings.json:
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -33,7 +31,6 @@ IConfiguration config = new ConfigurationBuilder()
 //Get implemented container APIs:
 var apiCollection = config.GetRequiredSection("ContainerApi");
 ArgumentNullException.ThrowIfNull(apiCollection);
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

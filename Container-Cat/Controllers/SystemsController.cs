@@ -12,6 +12,7 @@ using Container_Cat.Containers.Models;
 using Container_Cat.Utilities;
 using Container_Cat.Containers.EngineAPI.Models;
 using Container_Cat.Containers.EngineAPI;
+using static Container_Cat.Utilities.Models.HostAddress;
 
 namespace Container_Cat.Controllers
 {
@@ -68,9 +69,11 @@ namespace Container_Cat.Controllers
         public async Task<IActionResult> Create([Bind("Ip")] string Ip)
         {
             HostAddress host = new HostAddress(Ip);
-            SystemDataObj systemDataObj = new SystemDataObj(host);
-            if (ModelState.IsValid)
+            host.SetStatus(await _dataGatherer.IsAPIAvailableAsync(host));
+            if ((ModelState.IsValid) && (host.Availability == HostAvailability.Connected))
             {
+                SystemDataObj systemDataObj = new SystemDataObj(host);
+                systemDataObj.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(host);
                 HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
                 if (systemObj.InstalledContainerEngine != ContainerEngine.Unknown)
                 {

@@ -12,6 +12,8 @@ namespace Container_Cat.Data
         public ContainerCatContext (DbContextOptions<ContainerCatContext> options)
             : base(options)
         {
+            this.Database.Migrate();
+            this.Database.EnsureCreated();
         }
 
         public DbSet<Container_Cat.Containers.Models.BaseContainer> BaseContainer { get; set; } = default!;
