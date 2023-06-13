@@ -21,17 +21,17 @@ namespace Container_Cat.Containers.Models
         public string? IP { get; set; }
         public int PrivatePort { get; set; }
         public int PublicPort { get; set; }
-        public string Type { get; set; }
+        public string? Type { get; set; }
         public Port() { }
     }
     public class Mount
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
         public string Id { get; set; }// = "";
-        public string Type { get; set; }
+        public string? Type { get; set; }
         public string Source { get; set; }
         public string Destination { get; set; }
-        public bool RW { get; set; }
+        public bool? RW { get; set; }
         public Mount() { }
     }
 }
