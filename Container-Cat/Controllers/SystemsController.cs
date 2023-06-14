@@ -157,7 +157,7 @@ namespace Container_Cat.Controllers
             }
 
             var systemDataObj = await _context.SystemDataObj
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FindAsync(id);
             if (systemDataObj == null)
             {
                 return NotFound();
