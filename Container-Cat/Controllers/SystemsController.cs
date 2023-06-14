@@ -13,6 +13,7 @@ using Container_Cat.Utilities;
 using Container_Cat.Containers.EngineAPI.Models;
 using Container_Cat.Containers.EngineAPI;
 using static Container_Cat.Utilities.Models.HostAddress;
+using NuGet.Versioning;
 
 namespace Container_Cat.Controllers
 {
@@ -175,12 +176,27 @@ namespace Container_Cat.Controllers
             {
                 return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
             }
-            var systemDataObj = await _context.SystemDataObj.FindAsync(id);
+            var systemDataObj = await _context.SystemDataObj
+                .Where(x=> x.Id == id)
+                .Include(host => host.Containers)
+                .ThenInclude(ports => ports.Ports)
+                .Include(host => host.Containers)
+                .ThenInclude(mounts => mounts.Mounts)
+                .Include(container => container.Containers)
+                .Include(networks => networks.NetworkAddress)
+                .FirstAsync();
             if (systemDataObj != null)
             {
+                foreach (var container in systemDataObj.Containers)
+                {
+                    _context.Mount.RemoveRange(container.Mounts);
+                    _context.Port.RemoveRange(container.Ports);
+                }
+                _context.BaseContainer.RemoveRange(systemDataObj.Containers);
+                //
+                _context.HostAddress.Remove(systemDataObj.NetworkAddress);
                 _context.SystemDataObj.Remove(systemDataObj);
             }
-            
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
