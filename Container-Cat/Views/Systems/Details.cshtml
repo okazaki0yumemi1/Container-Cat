@@ -11,19 +11,19 @@
     <thead>
         <tr>
             <th>
-                            @Html.DisplayText("Container state");
+                <text>Container state</text>
             </th>
             <th>
-                            @Html.DisplayText("Container name");
+                <text>Container name</text>
             </th>
             <th>
-                            @Html.DisplayText("Container Id");
+                <text>Container Id</text>
             </th>
             <th>
-                            @Html.DisplayText("Container image");
+                <text>Container image</text>
             </th>
             <th>
-                            @Html.DisplayText("Container network address");
+                <text>Container network address</text>
             </th>
         </tr>
     </thead>
@@ -44,13 +44,12 @@
                                 @Html.DisplayFor(modelItem => item.Image)
                 </td>
                 <td>
-                    <ul class="list-unstyled">
-                        <tbody>
-                                @foreach (var portObj in item.Ports)
-                                        {
-                                         <li>@portObj;</li>
-                                        }
-                        </tbody>
+                    <ul class="w3-ul w3-border">
+                        @foreach (var portObj in item.Ports)
+                        {
+                            <li>@Html.DisplayName($"{portObj.PublicPort.ToString()}:{portObj.PrivatePort.ToString()}")</li>
+                        }
+                    </ul>
                 </td>
             </tr>
                     }

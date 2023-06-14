@@ -33,7 +33,10 @@ namespace Container_Cat.Controllers
         {
             if (_context.SystemDataObj != null)
             {
-                var results = await _context.SystemDataObj.Include(host => host.Containers).ToListAsync();
+                var results = await _context.SystemDataObj
+                    .Include(host => host.Containers)
+                    .Include(networks => networks.NetworkAddress)
+                    .ToListAsync();
                 return View(results);
             }
             else return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
@@ -46,8 +49,10 @@ namespace Container_Cat.Controllers
             {
                 return NotFound();
             }
-
-            var systemDataObj = await _context.SystemDataObj.Include(host => host.Containers).FirstOrDefaultAsync(m => m.Id == id);
+            var systemDataObj = await _context.SystemDataObj
+                .Include(host => host.Containers)
+                .ThenInclude(network => network.Ports)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (systemDataObj == null)
             {
                 return NotFound();

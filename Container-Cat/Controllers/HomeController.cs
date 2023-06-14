@@ -20,7 +20,6 @@ namespace Container_Cat.Controllers
         {
             return View();
         }
-
         public IActionResult HowTo()
         {
             return View();
