@@ -21,9 +21,13 @@ namespace Container_Cat.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult HowTo()
         {
             return View();
+        }
+        public IActionResult About()
+        {
+            return Redirect("https://github.com/okazaki0yumemi1/Container-Cat");
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
