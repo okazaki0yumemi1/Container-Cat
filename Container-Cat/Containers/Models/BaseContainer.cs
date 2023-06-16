@@ -13,6 +13,11 @@ namespace Container_Cat.Containers.Models
         public List<Port>? Ports { get; set; } = new List<Port>();
         public List<Mount>? Mounts { get; set; } = new List<Mount>();
         public BaseContainer() { }
+        public bool Equals(BaseContainer? obj)
+        {
+            if ((Id == obj.Id) && (Image == obj.Image)) return true;// base.Equals(obj);
+            else return false;
+        }
     }
     public class Port
     {

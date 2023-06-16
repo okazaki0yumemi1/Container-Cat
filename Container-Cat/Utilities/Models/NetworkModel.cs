@@ -82,6 +82,14 @@ namespace Container_Cat.Utilities.Models
             Availability = HostAvailability.NotTested;
         }
         public HostAddress() { }
+        public HostAddress(HostAddress newHost) 
+        {
+            Id = newHost.Id;
+            Ip = newHost.Ip;
+            Port = newHost.Port;
+            Availability = newHost.Availability;
+
+        }
         public void SetStatus(HostAvailability _status)
         {
             Availability = _status;

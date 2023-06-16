@@ -1,7 +1,7 @@
 ﻿@model Container_Cat.Utilities.Models.SystemDataObj
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Update";
 }
 
 <h1>Edit</h1>
@@ -10,13 +10,13 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Update">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="InstalledContainerEngine" class="control-label"></label>
-                <select asp-for="InstalledContainerEngine" class="form-control"></select>
-                <span asp-validation-for="InstalledContainerEngine" class="text-danger"></span>
+                <label asp-for="NetworkAddress" class="control-label"></label>
+                <select asp-for="NetworkAddress" class="form-control"></select>
+                <span asp-validation-for="NetworkAddress" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

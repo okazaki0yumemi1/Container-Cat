@@ -22,6 +22,37 @@ namespace Container_Cat.Utilities.Models
             NetworkAddress.Availability = HostAddress.HostAvailability.NotTested;
             InstalledContainerEngine = ContainerEngine.Unknown;
         }
+        public void ReplaceToBaseContainers(List<DockerContainer> containers)
+        {
+            Containers.Clear();
+            foreach (var dockerContainer in containers)
+            {
+                BaseContainer container = new BaseContainer();
+                container.Id = dockerContainer.Id;
+                container.Name = dockerContainer.Name;
+                container.State = dockerContainer.State;
+                container.Image = dockerContainer.Image;
+                foreach (var mountPoint in dockerContainer.Mounts)
+                {
+                    Containers.Models.Mount mount = new Containers.Models.Mount();
+                    mount.Source = mountPoint.Source;
+                    mount.Destination = mountPoint.Destination;
+                    mount.Type = mountPoint.Type;
+                    mount.RW = mountPoint.RW;
+                    container.Mounts.Add(mount);
+                }
+                foreach (var containerPort in dockerContainer.Ports)
+                {
+                    Containers.Models.Port port = new Containers.Models.Port();
+                    port.PrivatePort = containerPort.PrivatePort;
+                    port.PublicPort = containerPort.PublicPort;
+                    port.IP = containerPort.IP;
+                    port.Type = containerPort.Type;
+                    container.Ports.Add(port);
+                }
+                Containers.Add(container);
+            }
+        }
         public void AddBaseContainers(List<DockerContainer> containers)
         {
             foreach (var dockerContainer in containers) 

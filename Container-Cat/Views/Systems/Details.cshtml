@@ -14,16 +14,16 @@
                 <text>Container state</text>
             </th>
             <th>
-                <text>Container name</text>
-            </th>
-            <th>
-                <text>Container Id</text>
+                <text>Container name and id</text>
             </th>
             <th>
                 <text>Container image</text>
             </th>
             <th>
-                <text>Container network address</text>
+                <ul>
+                    <text>Port mapping:</text>
+                    <text>public port:private port</text>
+                </ul>
             </th>
         </tr>
     </thead>
@@ -35,10 +35,10 @@
                                 @Html.DisplayFor(modelItem => item.State)
                 </td>
                 <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                                @Html.DisplayFor(modelItem => item.Id)
+                    <ul>
+                        <li>@Html.DisplayFor(modelItem => item.Name)</li>
+                        <li>@Html.DisplayFor(modelItem => item.Id)</li>
+                    </ul>         
                 </td>
                 <td>
                                 @Html.DisplayFor(modelItem => item.Image)

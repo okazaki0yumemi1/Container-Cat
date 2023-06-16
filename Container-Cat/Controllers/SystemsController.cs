@@ -4,9 +4,10 @@ using Container_Cat.Data;
 using Container_Cat.Utilities;
 using Container_Cat.Utilities.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using static Container_Cat.Utilities.Models.HostAddress;
+using System.Linq;
 
 namespace Container_Cat.Controllers
 {
@@ -76,7 +77,7 @@ namespace Container_Cat.Controllers
                 HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
                 if (systemObj.InstalledContainerEngine != ContainerEngine.Unknown)
                 {
-                    //Get containers as BaseContainer:
+                    //Get newContainers as BaseContainer:
                     HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
                     var containers = await _dataGatherer.GetContainersAsync(dockerHost);
                     systemDataObj.AddBaseContainers(containers);
@@ -91,28 +92,55 @@ namespace Container_Cat.Controllers
             else return RedirectToAction(nameof(Index));
 
         }
-        // GET: Systems/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+        // GET: Systems/Update/5
+        public async Task<IActionResult> Update(Guid? id)
         {
             if (id == null || _context.SystemDataObj == null)
             {
                 return NotFound();
             }
 
-            var systemDataObj = await _context.SystemDataObj.FindAsync(id);
+            var systemDataObj = await _context.SystemDataObj.Where(x => x.Id == id)
+                .Include(network => network.NetworkAddress)
+                //get newContainers
+                .Include(host => host.Containers)
+                .ThenInclude(ports => ports.Ports)
+                //related Container.Ports objects
+                .Include(host => host.Containers)
+                .ThenInclude(mounts => mounts.Mounts)
+                //related Container.Mounts objects
+                .Include(container => container.Containers)
+                .FirstOrDefaultAsync();
             if (systemDataObj == null)
             {
                 return NotFound();
             }
-            return View(systemDataObj);
+            //previous container list:
+            //Create new docker host obj and pass info to systemDataObj
+            HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
+            systemDataObj.Containers.Clear();
+            systemDataObj.Containers.AddRange(await _dataGatherer.GetContainersAsync(dockerHost));
+            //current container list:
+            //var newContainers = systemDataObj.Containers;
+            //previousContainers.Except(systemDataObj.Containers);
+            //foreach (var container in systemDataObj.Containers)
+            //{
+            //    _context.Port.UpdateRange(container.Ports);
+            //    _context.Mount.UpdateRange(container.Mounts);
+            //}
+            //_context.UpdateRange(systemDataObj.Containers);
+            _context.Update(systemDataObj);
+            await _context.SaveChangesAsync();
+            //
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: Systems/Edit/5
+        // POST: Systems/Update/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,InstalledContainerEngines")] SystemDataObj systemDataObj)
+        public async Task<IActionResult> Update(Guid id, [Bind("Id,InstalledContainerEngines")] SystemDataObj systemDataObj)
         {
             if (id != systemDataObj.Id)
             {
@@ -180,7 +208,7 @@ namespace Container_Cat.Controllers
                 .ThenInclude(mounts => mounts.Mounts)
                 //related Container.Mounts objects
                 .Include(container => container.Containers)
-                //related containers
+                //related newContainers
                 .Include(networks => networks.NetworkAddress)
                 //related network info
                 .FirstAsync();
@@ -202,6 +230,19 @@ namespace Container_Cat.Controllers
         private bool SystemDataObjExists(Guid id)
         {
             return (_context.SystemDataObj?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+        public async Task<int> StageDeleteContainerByID(string id)
+        {
+            var containerToRemove = await _context.BaseContainer
+                .Include(x => x.Ports)
+                .Include(x => x.Mounts)
+                .FirstOrDefaultAsync();
+            if (containerToRemove == null)
+            {
+                return 0;
+            }
+            _context.Remove(containerToRemove);
+            return 1;
         }
     }
 }
