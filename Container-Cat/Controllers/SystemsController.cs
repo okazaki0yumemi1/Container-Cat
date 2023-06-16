@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Container_Cat.Data;
-using Container_Cat.Utilities.Models;
-using System.Net;
+﻿using Container_Cat.Containers.EngineAPI.Models;
 using Container_Cat.Containers.Models;
+using Container_Cat.Data;
 using Container_Cat.Utilities;
-using Container_Cat.Containers.EngineAPI.Models;
-using Container_Cat.Containers.EngineAPI;
+using Container_Cat.Utilities.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.EntityFrameworkCore;
 using static Container_Cat.Utilities.Models.HostAddress;
-using NuGet.Versioning;
 
 namespace Container_Cat.Controllers
 {
@@ -176,14 +169,20 @@ namespace Container_Cat.Controllers
             {
                 return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
             }
+            //Explicit loading of data for deletion:
             var systemDataObj = await _context.SystemDataObj
-                .Where(x=> x.Id == id)
+                .Where(x => x.Id == id)
+                //by id
                 .Include(host => host.Containers)
                 .ThenInclude(ports => ports.Ports)
+                //related Container.Ports objects
                 .Include(host => host.Containers)
                 .ThenInclude(mounts => mounts.Mounts)
+                //related Container.Mounts objects
                 .Include(container => container.Containers)
+                //related containers
                 .Include(networks => networks.NetworkAddress)
+                //related network info
                 .FirstAsync();
             if (systemDataObj != null)
             {
@@ -193,7 +192,6 @@ namespace Container_Cat.Controllers
                     _context.Port.RemoveRange(container.Ports);
                 }
                 _context.BaseContainer.RemoveRange(systemDataObj.Containers);
-                //
                 _context.HostAddress.Remove(systemDataObj.NetworkAddress);
                 _context.SystemDataObj.Remove(systemDataObj);
             }
@@ -203,7 +201,7 @@ namespace Container_Cat.Controllers
 
         private bool SystemDataObjExists(Guid id)
         {
-          return (_context.SystemDataObj?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.SystemDataObj?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
