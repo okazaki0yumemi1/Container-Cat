@@ -12,7 +12,9 @@ namespace Container_Cat.Containers.EngineAPI.Models
     public class DockerContainer : BaseContainer
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string objId { get; set; }
         public string Id { get; set; }
+        public string ContainerId { get; set; }
         public string[]? Names { get; set; }
         public string Image { get; set; }
         public string ImageID { get; set; }

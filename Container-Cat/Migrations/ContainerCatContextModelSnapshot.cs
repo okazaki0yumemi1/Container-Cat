@@ -19,8 +19,12 @@ namespace Container_Cat.Migrations
 
             modelBuilder.Entity("Container_Cat.Containers.Models.BaseContainer", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("objId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Id")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image")
@@ -37,7 +41,7 @@ namespace Container_Cat.Migrations
                     b.Property<Guid?>("SystemDataObjId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("objId");
 
                     b.HasIndex("SystemDataObjId");
 
@@ -50,7 +54,7 @@ namespace Container_Cat.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BaseContainerId")
+                    b.Property<string>("BaseContainerobjId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Destination")
@@ -69,7 +73,7 @@ namespace Container_Cat.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BaseContainerId");
+                    b.HasIndex("BaseContainerobjId");
 
                     b.ToTable("Mount");
                 });
@@ -80,7 +84,7 @@ namespace Container_Cat.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BaseContainerId")
+                    b.Property<string>("BaseContainerobjId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IP")
@@ -97,7 +101,7 @@ namespace Container_Cat.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BaseContainerId");
+                    b.HasIndex("BaseContainerobjId");
 
                     b.ToTable("Port");
                 });
@@ -153,14 +157,14 @@ namespace Container_Cat.Migrations
                 {
                     b.HasOne("Container_Cat.Containers.Models.BaseContainer", null)
                         .WithMany("Mounts")
-                        .HasForeignKey("BaseContainerId");
+                        .HasForeignKey("BaseContainerobjId");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Port", b =>
                 {
                     b.HasOne("Container_Cat.Containers.Models.BaseContainer", null)
                         .WithMany("Ports")
-                        .HasForeignKey("BaseContainerId");
+                        .HasForeignKey("BaseContainerobjId");
                 });
 
             modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>

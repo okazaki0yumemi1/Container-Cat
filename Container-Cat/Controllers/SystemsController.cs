@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using static Container_Cat.Utilities.Models.HostAddress;
 using System.Linq;
+using Microsoft.Extensions.Hosting;
+using static Container_Cat.Containers.ApiRoutes.DockerEngineAPIEndpoints;
 
 namespace Container_Cat.Controllers
 {
@@ -100,75 +102,77 @@ namespace Container_Cat.Controllers
                 return NotFound();
             }
 
-            var systemDataObj = await _context.SystemDataObj.Where(x => x.Id == id)
-                .Include(network => network.NetworkAddress)
-                //get newContainers
-                .Include(host => host.Containers)
-                .ThenInclude(ports => ports.Ports)
-                //related Container.Ports objects
-                .Include(host => host.Containers)
-                .ThenInclude(mounts => mounts.Mounts)
-                //related Container.Mounts objects
-                .Include(container => container.Containers)
-                .FirstOrDefaultAsync();
+            var systemDataObj = _context.SystemDataObj
+                .Where(x => x.Id == id)
+                .Include(x => x.Containers)
+                .Include(x => x.NetworkAddress)
+                .FirstOrDefault();
             if (systemDataObj == null)
             {
                 return NotFound();
             }
-            //previous container list:
-            //Create new docker host obj and pass info to systemDataObj
-            HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
-            systemDataObj.Containers.Clear();
-            systemDataObj.Containers.AddRange(await _dataGatherer.GetContainersAsync(dockerHost));
-            //current container list:
-            //var newContainers = systemDataObj.Containers;
-            //previousContainers.Except(systemDataObj.Containers);
-            //foreach (var container in systemDataObj.Containers)
-            //{
-            //    _context.Port.UpdateRange(container.Ports);
-            //    _context.Mount.UpdateRange(container.Mounts);
-            //}
-            //_context.UpdateRange(systemDataObj.Containers);
-            _context.Update(systemDataObj);
-            await _context.SaveChangesAsync();
-            //
+
+            var connectionStatus = _dataGatherer.IsAPIAvailableAsync(systemDataObj.NetworkAddress).Result;
+            systemDataObj.NetworkAddress.SetStatus(connectionStatus);
+            if ((ModelState.IsValid) && (connectionStatus == HostAvailability.Connected))
+            {
+                //SystemDataObj systemDataObj = new SystemDataObj(newObj.NetworkAddress);
+                //newObj.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(newObj.NetworkAddress);
+                HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
+                if (systemObj.InstalledContainerEngine == ContainerEngine.Docker)
+                {
+                    //Get newContainers as BaseContainer:
+                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
+                    systemDataObj.ReplaceToBaseContainers(await _dataGatherer.GetContainersAsync(dockerHost));
+                }
+                else if (systemObj.InstalledContainerEngine == ContainerEngine.Podman)
+                {
+                    throw new NotImplementedException();
+                }
+                _context.Update(systemDataObj);
+            }
+            else
+            {
+                _context.Update(systemDataObj);
+            }
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
         // POST: Systems/Update/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(Guid id, [Bind("Id,InstalledContainerEngines")] SystemDataObj systemDataObj)
-        {
-            if (id != systemDataObj.Id)
-            {
-                return NotFound();
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Update(Guid id, [Bind("Id,InstalledContainerEngines")] SystemDataObj systemDataObj)
+        //{
+        //    if (id != systemDataObj.Id)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(systemDataObj);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SystemDataObjExists(systemDataObj.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(systemDataObj);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(systemDataObj);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!SystemDataObjExists(systemDataObj.Id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(systemDataObj);
+        //}
 
         // GET: Systems/Delete/5
         public async Task<IActionResult> Delete(Guid? id)

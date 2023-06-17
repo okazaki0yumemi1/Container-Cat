@@ -19,6 +19,9 @@
             <th>
                 @Html.DisplayName("Container count")
             </th>
+            <th>
+                @Html.DisplayName("Connection status")
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -30,6 +33,9 @@
                 </td>
                 <td>
                     @Html.DisplayName($"{item.Containers.Count.ToString()}")
+                </td>
+                <td>
+                    @Html.DisplayName($"{item.NetworkAddress.Availability.ToString()}");
                 </td>
             <td>
                 <a asp-action="Update" asp-route-id="@item.Id">Update</a> |

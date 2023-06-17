@@ -22,6 +22,13 @@ namespace Container_Cat.Utilities.Models
             NetworkAddress.Availability = HostAddress.HostAvailability.NotTested;
             InstalledContainerEngine = ContainerEngine.Unknown;
         }
+        public SystemDataObj(SystemDataObj newObj)
+        {
+            Id = newObj.Id;
+            NetworkAddress = newObj.NetworkAddress;
+            InstalledContainerEngine = newObj.InstalledContainerEngine;
+            Containers = newObj.Containers;
+        }
         public void ReplaceToBaseContainers(List<DockerContainer> containers)
         {
             Containers.Clear();

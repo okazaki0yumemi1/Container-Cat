@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Container_Cat.Utilities.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Container_Cat.Containers.Models
@@ -6,6 +7,7 @@ namespace Container_Cat.Containers.Models
     public class BaseContainer
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string objId { get; set; }
         public string Id { get; set; } = "";
         public string State { get; set; }
         public string? Name { get; set; }

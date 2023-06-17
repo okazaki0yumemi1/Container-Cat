@@ -109,7 +109,7 @@ namespace Container_Cat.Utilities
             {
                 Console.WriteLine("\nException caught while testing host availability.");
                 Console.WriteLine("Message :{0} ", e.Message);
-                return HostAddress.HostAvailability.NotTested;
+                return HostAddress.HostAvailability.Unreachable;
             }
         }
         public async Task<List<DockerContainer>> GetContainersAsync(HostSystem<DockerContainer> dockerHost)
