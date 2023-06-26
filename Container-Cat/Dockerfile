@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /Container-Cat
 
 # Copy everything
-COPY *.csproj .
+COPY . .
 # Restore as distinct layers
 RUN dotnet restore --use-current-runtime  
 # Build and publish a release
