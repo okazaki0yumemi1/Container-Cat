@@ -22,12 +22,17 @@ Then navigate to /systems and click "Add new". Enter the guest IP or IP:2375 (or
 
 You can check this instruction (it's good): https://medium.com/@ssmak/how-to-enable-docker-remote-api-on-docker-host-7b73bd3278c6
 But basically, you have to edit
+
 `/lib/systemd/system/docker.service`
+
 by adding 
-`-H=tcp://0.0.0.0:2375` to listen to any addresses on port 2375 or `-H=tcp://{ip address of your machine}:2375` to access local containers.
-to the end of the starting with `ExecStart`. Save the file, then reload config files with `systemctl daemon-reload` and docker.service by `systemctl restart docker.service`.
+
+`-H=tcp://0.0.0.0:2375` (listen to any addresses on port 2375, or `-H=tcp://{ip address of your machine}:2375` to access local containers) to the end of the starting with `ExecStart`. Save the file, then reload config files with `systemctl daemon-reload` and docker.service by `systemctl restart docker.service`.
+
 Start the container by running:
+
 `docker run --rm -p 8001:80 okazakiyumemi/containercat -d`
+
 The web page will be available on `localhost:8001`.
 
 # Technical details
