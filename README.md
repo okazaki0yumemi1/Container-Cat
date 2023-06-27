@@ -8,15 +8,29 @@ SystemDataObject (network info, container engine info, status...). Then it gets 
 ## What is it?
 This is supposed to be a simple monitoring tool for Docker and Podman systems. Learning and implementing real-time monitoring will delay the release though, so right now it can connect to Docker socket via hostname (or IPv4 and port) and gather info on containers: ID, image, mapped ports.
 
-## How to use this app?
+# How to use this app?
+
+## General details
 Right now this app can only connect to docker.sock without any security measures. The best (and easiest) way to try it is to create Linux virtual machine, get Docker and install some containers. Then you have to:
 1. "Open" Docker socket,
 2. Reload Docker service inside your VM,
 3. Enter the IP of your guest machine. The default port is 2375, but IIRC you can change it.
 Then navigate to /systems and click "Add new". Enter the guest IP or IP:2375 (or any port leading to your guest machine) and click "Add". You will be redirected to /systems page with new info. 
-"Update" link, well, updates info on Docker host and its containers. You can also delete host machine and all it's containers by clicking on "Delete" link. 
+"Update" link, well, updates info on Docker host and its containers. You can also delete host machine and all it's containers by clicking on "Delete" link.
 
-## Technical details
+## How to set up hosts?
+
+You can check this instruction (it's good): https://medium.com/@ssmak/how-to-enable-docker-remote-api-on-docker-host-7b73bd3278c6
+But basically, you have to edit
+`/lib/systemd/system/docker.service`
+by adding 
+`-H=tcp://0.0.0.0:2375` to listen to any addresses on port 2375 or `-H=tcp://{ip address of your machine}:2375` to access local containers.
+to the end of the starting with `ExecStart`. Save the file, then reload config files with `systemctl daemon-reload` and docker.service by `systemctl restart docker.service`.
+Start the container by running:
+`docker run --rm -p 8001:80 okazakiyumemi/containercat -d`
+The web page will be available on `localhost:8001`.
+
+# Technical details
 The project itself is written on C# (.NET 7).
 Things I used in this project:
 1. Project template is ASP .NET Core MVC, which was chosen mostly because of simplicity of my project. 
@@ -27,6 +41,7 @@ I will also try to containerize my app with both **Docker** and **Podman**.
   
   
 ### Right now paths:
+  `/`
   `/systems/`
   `/systems/create`
   `/systems/delete/{id}`
