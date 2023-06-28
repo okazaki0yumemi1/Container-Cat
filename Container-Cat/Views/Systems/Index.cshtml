@@ -29,7 +29,7 @@
 @foreach (var item in Model) {
             <tr>
                 <td>
-                    @Html.DisplayName($"{item.NetworkAddress.Ip}")
+                    @Html.DisplayName($"{item.NetworkAddress.Hostname}")
                 </td>
                 <td>
                     @Html.DisplayName($"{item.Containers.Count.ToString()}")

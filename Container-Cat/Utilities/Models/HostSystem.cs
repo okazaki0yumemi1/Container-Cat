@@ -25,5 +25,6 @@ namespace Container_Cat.Utilities.Models
             Id = Guid.NewGuid();
             NetworkAddress.SetStatus(_networkAddr.Availability);
         }
+        public HostSystem() {}
     }
 }

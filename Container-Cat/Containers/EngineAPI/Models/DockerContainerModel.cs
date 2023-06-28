@@ -11,20 +11,14 @@ namespace Container_Cat.Containers.EngineAPI.Models
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string objId { get; set; }
-        public string Id { get; set; }
         public string ContainerId { get; set; }
+
+        [NotMapped]
         public string[]? Names { get; set; }
-        public string Image { get; set; }
-        public string ImageID { get; set; }
-        public string Command { get; set; }
         public int Created { get; set; }
-        public Port[]? Ports { get; set; }
         public Labels? Labels { get; set; }
-        public string State { get; set; }
-        public string Status { get; set; }
         public Hostconfig? HostConfig { get; set; }
-        public Networksettings? NetworkSettings { get; set; }
-        public Mount[]? Mounts { get; set; }
+        public Networksettings? NetworkSettings { get; set;}
     }
 
     public class Labels
@@ -62,9 +56,6 @@ namespace Container_Cat.Containers.EngineAPI.Models
 
     public class Networks
     {
-        public object? IPAMConfig { get; set; }
-        public object? Links { get; set; }
-        public object? Aliases { get; set; }
         public string? NetworkID { get; set; }
         public string? EndpointID { get; set; }
         public string? Gateway { get; set; }
@@ -74,7 +65,6 @@ namespace Container_Cat.Containers.EngineAPI.Models
         public string? GlobalIPv6Address { get; set; }
         public int? GlobalIPv6PrefixLen { get; set; }
         public string? MacAddress { get; set; }
-        public object? DriverOpts { get; set; }
     }
 
     public class Mount

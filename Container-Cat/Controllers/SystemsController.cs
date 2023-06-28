@@ -95,53 +95,38 @@ namespace Container_Cat.Controllers
         // GET: Systems/Update/5
         public async Task<IActionResult> Update(Guid? id)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            if (id == null) return BadRequest();
 
-            //if (id == null || _context.SystemDataObj == null)
-            //{
-            //    return NotFound();
-            //}
+            var HostSystem = _context.HostSystems
+                .Where(x => x.Id == id)
+                .Include(x => x.Containers)
+                .Include(x => x.NetworkAddress)
+                .FirstOrDefault();
+            if (HostSystem  == null)
+            {
+                return NotFound();
+            }
 
-            //var systemDataObj = _context.SystemDataObj
-            //    .Where(x => x.Id == id)
-            //    .Include(x => x.Containers)
-            //    .Include(x => x.NetworkAddress)
-            //    .FirstOrDefault();
-            //if (systemDataObj == null)
-            //{
-            //    return NotFound();
-            //}
+            var connectionStatus = _dataGatherer
+                .IsAPIAvailableAsync(HostSystem.NetworkAddress.Hostname)
+                .Result;
+            HostSystem .NetworkAddress.SetStatus(connectionStatus);
+            if (connectionStatus != HostAvailability.Connected) return BadRequest();
 
-            //var connectionStatus = _dataGatherer
-            //    .IsAPIAvailableAsync(systemDataObj.NetworkAddress.Hostname)
-            //    .Result;
-            //systemDataObj.NetworkAddress.SetStatus(connectionStatus);
-            //if ((ModelState.IsValid) && (connectionStatus == HostAvailability.Connected))
-            //{
-            //    //SystemDataObj systemDataObj = new SystemDataObj(newObj.NetworkAddress);
-            //    //newObj.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(newObj.NetworkAddress);
-            //    HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
-            //    if (systemObj.InstalledContainerEngine == ContainerEngine.Docker)
-            //    {
-            //        //Get newContainers as BaseContainer:
-            //        HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(
-            //            systemDataObj
-            //        );
-            //        systemDataObj.ReplaceToBaseContainers(
-            //            await _dataGatherer.GetContainersAsync(dockerHost)
-            //        );
-            //    }
-            //    else if (systemObj.InstalledContainerEngine == ContainerEngine.Podman)
-            //    {
-            //        throw new NotImplementedException();
-            //    }
-            //    _context.Update(systemDataObj);
-            //}
-            //else
-            //{
-            //    _context.Update(systemDataObj);
-            //}
-            //_context.SaveChanges();
-            //return RedirectToAction(nameof(Index));
+            if (HostSystem .InstalledContainerEngine == ContainerEngine.Docker)
+            {
+                    //Get newContainers as BaseContainer:
+                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(HostSystem.NetworkAddress);
+                    HostSystem.ReplaceToBaseContainers(await _dataGatherer.GetContainersAsync(dockerHost));
+            }
+            else if (HostSystem.InstalledContainerEngine == ContainerEngine.Podman)
+            {
+                    throw new NotImplementedException();
+            }
+            _context.Update(HostSystem);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(Guid? id)
@@ -170,7 +155,7 @@ namespace Container_Cat.Controllers
                 return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
             }
             //Explicit loading of data for deletion:
-            var systemDataObj = await _context.SystemDataObj
+            var HostSystem  = await _context.HostSystems 
                 .Where(x => x.Id == id)
                 //by id
                 .Include(host => host.Containers)
@@ -184,16 +169,16 @@ namespace Container_Cat.Controllers
                 .Include(networks => networks.NetworkAddress)
                 //related network info
                 .FirstAsync();
-            if (systemDataObj != null)
+            if (HostSystem  != null)
             {
-                foreach (var container in systemDataObj.Containers)
+                foreach (var container in HostSystem .Containers)
                 {
-                    _context.Mount.RemoveRange(container.Mounts);
-                    _context.Port.RemoveRange(container.Ports);
+                    _context.Mounts.RemoveRange(container.Mounts);
+                    _context.Ports.RemoveRange(container.Ports);
                 }
-                _context.BaseContainer.RemoveRange(systemDataObj.Containers);
-                _context.HostAddress.Remove(systemDataObj.NetworkAddress);
-                _context.SystemDataObj.Remove(systemDataObj);
+                _context.BaseContainer.RemoveRange(HostSystem.Containers);
+                _context.HostAddresses.Remove(HostSystem.NetworkAddress);
+                _context.HostSystems.Remove(HostSystem);
             }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

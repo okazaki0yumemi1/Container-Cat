@@ -16,12 +16,12 @@ namespace Container_Cat.Utilities
             _client.Timeout = TimeSpan.FromSeconds(20);
         }
 
-        async Task<ContainerEngine> DetectApiAsync(HostAddress hostAddr)
+        async Task<ContainerEngine> DetectApiAsync(string hostAddr)
         {
             try
             {
                 HttpResponseMessage response = await _client.GetAsync(
-                    $"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}"
+                    $"http://{hostAddr}/{DockerEngineAPIEndpoints.Version}"
                 );
                 if (response.IsSuccessStatusCode)
                 {
@@ -32,7 +32,7 @@ namespace Container_Cat.Utilities
                     //response = await client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Info}");
                     //This is just for testing:
                     response = await _client.GetAsync(
-                        $"http://{hostAddr.Ip}{hostAddr.Port}/libpod/info"
+                        $"http://{hostAddr}/libpod/info"
                     );
                     response.EnsureSuccessStatusCode();
                     return ContainerEngine.Podman;
@@ -132,7 +132,7 @@ namespace Container_Cat.Utilities
             HostSystem<DockerContainer> dockerHost
         )
         {
-            var probe = await IsAPIAvailableAsync(dockerHost.NetworkAddress);
+            var probe = await IsAPIAvailableAsync(dockerHost.NetworkAddress.Hostname);
             if (probe == HostAvailability.Connected)
             {
                 dockerHost.NetworkAddress.SetStatus(HostAvailability.Connected);
@@ -144,7 +144,7 @@ namespace Container_Cat.Utilities
                 if (containers.Count == 0)
                 {
                     Console.WriteLine(
-                        $"Failed to get container list for {dockerHost.NetworkAddress.Ip}{dockerHost.NetworkAddress.Port}, empty container will be added."
+                        $"Failed to get container list for {dockerHost.NetworkAddress.Hostname}, empty container will be added."
                     );
                     return (new List<DockerContainer>());
                 }

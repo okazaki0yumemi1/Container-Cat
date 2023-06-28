@@ -23,7 +23,7 @@ namespace Container_Cat.Containers.EngineAPI
             try
             {
                 HttpResponseMessage response = await client.GetAsync(
-                    $"http://{networkAddr.Ip}{networkAddr.Port}/"
+                    $"http://{networkAddr.Hostname}{networkAddr.Port}/"
                         + DockerEngineAPIEndpoints.Containers.GetAllContainers
                 );
                 if (response.IsSuccessStatusCode)
@@ -47,7 +47,7 @@ namespace Container_Cat.Containers.EngineAPI
         {
             DockerContainer container = new DockerContainer();
             var uri =
-                $"http://{networkAddr.Ip}{networkAddr.Port}/"
+                $"http://{networkAddr.Hostname}{networkAddr.Port}/"
                 + DockerEngineAPIEndpoints.Containers.GetContainerByID.Replace("{id}", Id);
             try
             {
