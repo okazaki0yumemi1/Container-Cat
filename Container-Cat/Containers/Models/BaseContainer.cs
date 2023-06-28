@@ -1,5 +1,4 @@
-﻿using Container_Cat.Utilities.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Container_Cat.Containers.Models

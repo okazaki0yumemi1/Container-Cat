@@ -1,9 +1,4 @@
-﻿using Container_Cat.Containers.EngineAPI.Models;
-using Container_Cat.Containers.Models;
-using Container_Cat.Models;
-using Container_Cat.PodmanAPI.Models;
-using Container_Cat.Utilities;
-using Container_Cat.Utilities.Models;
+﻿using Container_Cat.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

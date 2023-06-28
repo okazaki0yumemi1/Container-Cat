@@ -4,12 +4,8 @@ using Container_Cat.Data;
 using Container_Cat.Utilities;
 using Container_Cat.Utilities.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using static Container_Cat.Utilities.Models.HostAddress;
-using System.Linq;
-using Microsoft.Extensions.Hosting;
-using static Container_Cat.Containers.ApiRoutes.DockerEngineAPIEndpoints;
 
 namespace Container_Cat.Controllers
 {

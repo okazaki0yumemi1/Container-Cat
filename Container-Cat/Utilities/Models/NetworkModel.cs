@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System.Text.RegularExpressions;
-
-namespace Container_Cat.Utilities.Models
+﻿namespace Container_Cat.Utilities.Models
 {
     public class HostAddress
     {
