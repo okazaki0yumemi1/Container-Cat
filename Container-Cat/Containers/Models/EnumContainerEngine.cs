@@ -2,8 +2,8 @@
 {
     public enum ContainerEngine
     {
+        Unknown = 0,
         Docker,
-        Podman,
-        Unknown
+        Podman
     }
 }

@@ -6,6 +6,7 @@ namespace Container_Cat.Utilities.Models
     public class HostAddress
     {
         public Guid Id { get; set; }
+
         public enum HostAvailability
         {
             Unreachable,
@@ -13,22 +14,21 @@ namespace Container_Cat.Utilities.Models
             WaitingForResult,
             NotTested
         }
+
         public HostAvailability Availability { get; set; }
         private string hostname = "";
         public string Ip
         {
-            get 
-            { 
-                return hostname; 
-            }
-            set 
-            { 
+            get { return hostname; }
+            set
+            {
                 if (value == null || value.Length < 1)
                 {
                     Console.WriteLine("Null or empty value of Hostname.Ip passed.");
                     hostname = "";
                 }
-                else hostname = value; 
+                else
+                    hostname = value;
             }
             /*
             get { return Ip; }
@@ -50,9 +50,7 @@ namespace Container_Cat.Utilities.Models
             }
             */
         }
-        public string? Port
-        {
-            get; set;
+        public string? Port { get; set;
             /*
             get { return Port; }
             set
@@ -67,6 +65,7 @@ namespace Container_Cat.Utilities.Models
             }
             */
         }
+
         public HostAddress(string _ip, string _port)
         {
             Id = Guid.NewGuid();
@@ -74,6 +73,7 @@ namespace Container_Cat.Utilities.Models
             Port = ":" + _port;
             Availability = HostAvailability.NotTested;
         }
+
         public HostAddress(string _ip)
         {
             Id = Guid.NewGuid();
@@ -81,15 +81,17 @@ namespace Container_Cat.Utilities.Models
             Ip = _ip;
             Availability = HostAvailability.NotTested;
         }
+
         public HostAddress() { }
-        public HostAddress(HostAddress newHost) 
+
+        public HostAddress(HostAddress newHost)
         {
             Id = newHost.Id;
             Ip = newHost.Ip;
             Port = newHost.Port;
             Availability = newHost.Availability;
-
         }
+
         public void SetStatus(HostAvailability _status)
         {
             Availability = _status;

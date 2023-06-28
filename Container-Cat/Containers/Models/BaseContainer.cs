@@ -14,31 +14,39 @@ namespace Container_Cat.Containers.Models
         public string Image { get; set; }
         public List<Port>? Ports { get; set; } = new List<Port>();
         public List<Mount>? Mounts { get; set; } = new List<Mount>();
+
         public BaseContainer() { }
+
         public bool Equals(BaseContainer? obj)
         {
-            if ((Id == obj.Id) && (Image == obj.Image)) return true;// base.Equals(obj);
-            else return false;
+            if ((Id == obj.Id) && (Image == obj.Image))
+                return true; // base.Equals(obj);
+            else
+                return false;
         }
     }
+
     public class Port
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }// = "";
+        public string Id { get; set; } // = "";
         public string? IP { get; set; }
         public int PrivatePort { get; set; }
         public int PublicPort { get; set; }
         public string? Type { get; set; }
+
         public Port() { }
     }
+
     public class Mount
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
-        public string Id { get; set; }// = "";
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Id { get; set; } // = "";
         public string? Type { get; set; }
         public string Source { get; set; }
         public string Destination { get; set; }
         public bool? RW { get; set; }
+
         public Mount() { }
     }
 }

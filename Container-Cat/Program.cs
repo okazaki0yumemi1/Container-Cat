@@ -3,13 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Container_Cat.Data;
 
-
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<ContainerCatContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("ContainerCatContext") ?? throw new InvalidOperationException("Connection string 'ContainerCatContext' not found.")));
+builder.Services.AddDbContext<ContainerCatContext>(
+    options =>
+        options.UseSqlite(
+            builder.Configuration.GetConnectionString("ContainerCatContext")
+                ?? throw new InvalidOperationException(
+                    "Connection string 'ContainerCatContext' not found."
+                )
+        )
+);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 // Add HttpClient service.
 builder.Services.AddHttpClient();
 var app = builder.Build();
@@ -36,11 +43,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
- 
+
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

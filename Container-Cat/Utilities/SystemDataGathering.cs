@@ -10,16 +10,20 @@ namespace Container_Cat.Utilities
     public class SystemDataGathering
     {
         private readonly HttpClient _client;
-        public SystemDataGathering(HttpClient client)//, HostAddress _hostAddr)
+
+        public SystemDataGathering(HttpClient client) //, HostAddress _hostAddr)
         {
             _client = client;
             _client.Timeout = TimeSpan.FromSeconds(20);
         }
+
         async Task<ContainerEngine> DetectApiAsync(HostAddress hostAddr)
         {
             try
             {
-                HttpResponseMessage response = await _client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}");
+                HttpResponseMessage response = await _client.GetAsync(
+                    $"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Version}"
+                );
                 if (response.IsSuccessStatusCode)
                 {
                     return ContainerEngine.Docker;
@@ -28,13 +32,17 @@ namespace Container_Cat.Utilities
                 {
                     //response = await client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/{DockerEngineAPIEndpoints.Info}");
                     //This is just for testing:
-                    response = await _client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/libpod/info");
+                    response = await _client.GetAsync(
+                        $"http://{hostAddr.Ip}{hostAddr.Port}/libpod/info"
+                    );
                     response.EnsureSuccessStatusCode();
                     return ContainerEngine.Podman;
                 }
                 else
                 {
-                    NotImplementedException e = new NotImplementedException("Unable to identify container engine from response body.");
+                    NotImplementedException e = new NotImplementedException(
+                        "Unable to identify container engine from response body."
+                    );
                     throw e;
                 }
             }
@@ -45,6 +53,7 @@ namespace Container_Cat.Utilities
                 return ContainerEngine.Unknown;
             }
         }
+
         //public async IAsyncEnumerable<SystemDataObj> FetchDataObjectRangeAsync(List<HostAddress> hostAddr)
         //{
         //    foreach (var host in hostAddr)
@@ -93,16 +102,23 @@ namespace Container_Cat.Utilities
             var apiType = await DetectApiAsync(hostAddress);
             return apiType;
         }
+
         public async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
             try
             {
-                using HttpResponseMessage response = await _client.GetAsync($"http://{hostAddr.Ip}{hostAddr.Port}/info");
+                using HttpResponseMessage response = await _client.GetAsync(
+                    $"http://{hostAddr.Ip}{hostAddr.Port}/info"
+                );
                 switch ((int)response.StatusCode)
                 {
-                    case 200: return HostAddress.HostAvailability.Connected;
-                    case >= 400 and < 500: return HostAddress.HostAvailability.Unreachable;
-                    default: return HostAddress.HostAvailability.Unreachable;
+                    case 200:
+                        return HostAddress.HostAvailability.Connected;
+                    case >= 400
+                    and < 500:
+                        return HostAddress.HostAvailability.Unreachable;
+                    default:
+                        return HostAddress.HostAvailability.Unreachable;
                 }
             }
             catch (Exception e)
@@ -112,17 +128,25 @@ namespace Container_Cat.Utilities
                 return HostAddress.HostAvailability.Unreachable;
             }
         }
-        public async Task<List<DockerContainer>> GetContainersAsync(HostSystem<DockerContainer> dockerHost)
+
+        public async Task<List<DockerContainer>> GetContainersAsync(
+            HostSystem<DockerContainer> dockerHost
+        )
         {
             var probe = await IsAPIAvailableAsync(dockerHost.NetworkAddress);
             if (probe == HostAddress.HostAvailability.Connected)
             {
                 dockerHost.NetworkAddress.SetStatus(HostAddress.HostAvailability.Connected);
-                DockerContainerOperations cOps = new DockerContainerOperations(_client, dockerHost.NetworkAddress);
+                DockerContainerOperations cOps = new DockerContainerOperations(
+                    _client,
+                    dockerHost.NetworkAddress
+                );
                 var containers = await cOps.ListContainersAsync();
                 if (containers.Count == 0)
                 {
-                    Console.WriteLine($"Failed to get container list for {dockerHost.NetworkAddress.Ip}{dockerHost.NetworkAddress.Port}, empty container will be added.");
+                    Console.WriteLine(
+                        $"Failed to get container list for {dockerHost.NetworkAddress.Ip}{dockerHost.NetworkAddress.Port}, empty container will be added."
+                    );
                     return (new List<DockerContainer>());
                 }
                 else
@@ -130,7 +154,8 @@ namespace Container_Cat.Utilities
                     return containers;
                 }
             }
-            else return (new List<DockerContainer>());
+            else
+                return (new List<DockerContainer>());
         }
     }
 }

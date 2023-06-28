@@ -10,18 +10,21 @@ namespace Container_Cat.Utilities.Models
         public HostAddress NetworkAddress { get; set; } = new HostAddress();
         public ContainerEngine InstalledContainerEngine { get; set; } = ContainerEngine.Unknown;
         public List<BaseContainer> Containers { get; set; } = new List<BaseContainer>();
+
         public SystemDataObj(HostAddress _networkAddr)
         {
             Id = Guid.NewGuid();
             NetworkAddress = _networkAddr;
             NetworkAddress.SetStatus(HostAddress.HostAvailability.NotTested);
         }
-        public SystemDataObj() 
+
+        public SystemDataObj()
         {
             Id = Guid.NewGuid();
             NetworkAddress.Availability = HostAddress.HostAvailability.NotTested;
             InstalledContainerEngine = ContainerEngine.Unknown;
         }
+
         public SystemDataObj(SystemDataObj newObj)
         {
             Id = newObj.Id;
@@ -29,6 +32,7 @@ namespace Container_Cat.Utilities.Models
             InstalledContainerEngine = newObj.InstalledContainerEngine;
             Containers = newObj.Containers;
         }
+
         public void ReplaceToBaseContainers(List<DockerContainer> containers)
         {
             Containers.Clear();
@@ -60,10 +64,11 @@ namespace Container_Cat.Utilities.Models
                 Containers.Add(container);
             }
         }
+
         public void AddBaseContainers(List<DockerContainer> containers)
         {
-            foreach (var dockerContainer in containers) 
-            { 
+            foreach (var dockerContainer in containers)
+            {
                 BaseContainer container = new BaseContainer();
                 container.Id = dockerContainer.Id;
                 container.Name = dockerContainer.Name;

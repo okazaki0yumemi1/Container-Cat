@@ -4,6 +4,7 @@
     {
         public const string Version = "version";
         public const string Events = "events";
+
         public class Containers
         {
             public const string BaseAddr = "containers";
@@ -13,14 +14,17 @@
             public const string StartContainer = BaseAddr + "/{id}/start";
             public const string StopContainer = BaseAddr + "/{id}/stop";
             public const string RestartContainer = BaseAddr + "/{id}/restart";
+
             public Containers() { }
         }
+
         public class Images
         {
             public const string BaseAddr = "images";
             public const string ListImages = BaseAddr + "/json";
             public const string GetImageByName = BaseAddr + "/{name}/json";
         }
+
         public class Networks
         {
             public const string BaseAddr = "networks";

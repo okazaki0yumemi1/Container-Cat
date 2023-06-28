@@ -18,6 +18,7 @@ namespace Container_Cat.Controllers
         private readonly ContainerCatContext _context;
         private readonly HttpClient _httpClient;
         private SystemDataGathering _dataGatherer;
+
         public SystemsController(ContainerCatContext context, HttpClient client)
         {
             _context = context;
@@ -36,7 +37,8 @@ namespace Container_Cat.Controllers
                     .ToListAsync();
                 return View(results);
             }
-            else return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
+            else
+                return Problem("Entity set 'ContainerCatContext.SystemDataObj'  is null.");
         }
 
         // GET: Systems/Details/5
@@ -75,12 +77,15 @@ namespace Container_Cat.Controllers
             if ((ModelState.IsValid) && (host.Availability == HostAvailability.Connected))
             {
                 SystemDataObj systemDataObj = new SystemDataObj(host);
-                systemDataObj.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(host);
+                systemDataObj.InstalledContainerEngine =
+                    await _dataGatherer.ContainerEngineInstalledAsync(host);
                 HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
                 if (systemObj.InstalledContainerEngine != ContainerEngine.Unknown)
                 {
                     //Get newContainers as BaseContainer:
-                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
+                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(
+                        systemDataObj
+                    );
                     var containers = await _dataGatherer.GetContainersAsync(dockerHost);
                     systemDataObj.AddBaseContainers(containers);
                     //Change two lines above to this later:
@@ -89,11 +94,13 @@ namespace Container_Cat.Controllers
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                else return RedirectToAction(nameof(Index));
+                else
+                    return RedirectToAction(nameof(Index));
             }
-            else return RedirectToAction(nameof(Index));
-
+            else
+                return RedirectToAction(nameof(Index));
         }
+
         // GET: Systems/Update/5
         public async Task<IActionResult> Update(Guid? id)
         {
@@ -112,7 +119,9 @@ namespace Container_Cat.Controllers
                 return NotFound();
             }
 
-            var connectionStatus = _dataGatherer.IsAPIAvailableAsync(systemDataObj.NetworkAddress).Result;
+            var connectionStatus = _dataGatherer
+                .IsAPIAvailableAsync(systemDataObj.NetworkAddress)
+                .Result;
             systemDataObj.NetworkAddress.SetStatus(connectionStatus);
             if ((ModelState.IsValid) && (connectionStatus == HostAvailability.Connected))
             {
@@ -122,8 +131,12 @@ namespace Container_Cat.Controllers
                 if (systemObj.InstalledContainerEngine == ContainerEngine.Docker)
                 {
                     //Get newContainers as BaseContainer:
-                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(systemDataObj);
-                    systemDataObj.ReplaceToBaseContainers(await _dataGatherer.GetContainersAsync(dockerHost));
+                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(
+                        systemDataObj
+                    );
+                    systemDataObj.ReplaceToBaseContainers(
+                        await _dataGatherer.GetContainersAsync(dockerHost)
+                    );
                 }
                 else if (systemObj.InstalledContainerEngine == ContainerEngine.Podman)
                 {
@@ -182,8 +195,7 @@ namespace Container_Cat.Controllers
                 return NotFound();
             }
 
-            var systemDataObj = await _context.SystemDataObj
-                .FindAsync(id);
+            var systemDataObj = await _context.SystemDataObj.FindAsync(id);
             if (systemDataObj == null)
             {
                 return NotFound();
@@ -235,6 +247,7 @@ namespace Container_Cat.Controllers
         {
             return (_context.SystemDataObj?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
         public async Task<int> StageDeleteContainerByID(string id)
         {
             var containerToRemove = await _context.BaseContainer

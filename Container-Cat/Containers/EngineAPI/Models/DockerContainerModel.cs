@@ -4,9 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Container_Cat.Containers.EngineAPI.Models
 {
-
-
-    //public class DockerContainer 
+    //public class DockerContainer
     //{
     //    public DockerContainer() { }
     public class DockerContainer : BaseContainer
@@ -28,6 +26,7 @@ namespace Container_Cat.Containers.EngineAPI.Models
         public Networksettings? NetworkSettings { get; set; }
         public Mount[]? Mounts { get; set; }
     }
+
     public class Labels
     {
         public string? comdockercomposeconfighash { get; set; }
@@ -50,14 +49,17 @@ namespace Container_Cat.Containers.EngineAPI.Models
         public string? orgopencontainersimageurl { get; set; }
         public string? orgopencontainersimageversion { get; set; }
     }
+
     public class Hostconfig
     {
         public string? NetworkMode { get; set; }
     }
+
     public class Networksettings
     {
         public Networks? Networks { get; set; }
     }
+
     public class Networks
     {
         public object? IPAMConfig { get; set; }
@@ -74,6 +76,7 @@ namespace Container_Cat.Containers.EngineAPI.Models
         public string? MacAddress { get; set; }
         public object? DriverOpts { get; set; }
     }
+
     public class Mount
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
