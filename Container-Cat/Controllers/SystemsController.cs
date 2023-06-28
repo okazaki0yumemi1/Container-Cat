@@ -5,6 +5,7 @@ using Container_Cat.Utilities;
 using Container_Cat.Utilities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using static Container_Cat.Utilities.Models.HostAddress;
 
 namespace Container_Cat.Controllers
@@ -66,124 +67,83 @@ namespace Container_Cat.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Ip")] string Ip)
+        public async Task<IActionResult> Create([Bind("Ip")] string hostname)
         {
-            HostAddress host = new HostAddress(Ip);
-            host.SetStatus(await _dataGatherer.IsAPIAvailableAsync(host));
-            if ((ModelState.IsValid) && (host.Availability == HostAvailability.Connected))
+            if (!ModelState.IsValid) return BadRequest();
+            if (hostname.IsNullOrEmpty()) return BadRequest();
+
+            var hostStatus = await _dataGatherer.IsAPIAvailableAsync(hostname);
+            if (hostStatus != HostAvailability.Connected) return BadRequest();
+
+            HostSystemDTO hostSystemDTO = new HostSystemDTO();
+            hostSystemDTO.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(hostname);
+            hostSystemDTO.NetworkAddress = new HostAddress(hostname);
+
+            if (hostSystemDTO.InstalledContainerEngine == ContainerEngine.Docker)
             {
-                SystemDataObj systemDataObj = new SystemDataObj(host);
-                systemDataObj.InstalledContainerEngine =
-                    await _dataGatherer.ContainerEngineInstalledAsync(host);
-                HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
-                if (systemObj.InstalledContainerEngine != ContainerEngine.Unknown)
-                {
-                    //Get newContainers as BaseContainer:
-                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(
-                        systemDataObj
-                    );
-                    var containers = await _dataGatherer.GetContainersAsync(dockerHost);
-                    systemDataObj.AddBaseContainers(containers);
-                    //Change two lines above to this later:
-                    //systemDataObj.AddBaseContainers(await _dataGatherer.GetContainersAsync(dockerHost));
-                    _context.Add(systemDataObj);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                    return RedirectToAction(nameof(Index));
-            }
-            else
+                //Get newContainers as BaseContainer:
+                HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(hostSystemDTO);
+                var containers = await _dataGatherer.GetContainersAsync(dockerHost);
+                _context.Add(dockerHost);
+                hostSystemDTO.ConvertToBaseContainers(containers);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            else return RedirectToAction(nameof(Index));
         }
 
         // GET: Systems/Update/5
         public async Task<IActionResult> Update(Guid? id)
         {
-            if (id == null || _context.SystemDataObj == null)
-            {
-                return NotFound();
-            }
 
-            var systemDataObj = _context.SystemDataObj
-                .Where(x => x.Id == id)
-                .Include(x => x.Containers)
-                .Include(x => x.NetworkAddress)
-                .FirstOrDefault();
-            if (systemDataObj == null)
-            {
-                return NotFound();
-            }
+            //if (id == null || _context.SystemDataObj == null)
+            //{
+            //    return NotFound();
+            //}
 
-            var connectionStatus = _dataGatherer
-                .IsAPIAvailableAsync(systemDataObj.NetworkAddress)
-                .Result;
-            systemDataObj.NetworkAddress.SetStatus(connectionStatus);
-            if ((ModelState.IsValid) && (connectionStatus == HostAvailability.Connected))
-            {
-                //SystemDataObj systemDataObj = new SystemDataObj(newObj.NetworkAddress);
-                //newObj.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(newObj.NetworkAddress);
-                HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
-                if (systemObj.InstalledContainerEngine == ContainerEngine.Docker)
-                {
-                    //Get newContainers as BaseContainer:
-                    HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(
-                        systemDataObj
-                    );
-                    systemDataObj.ReplaceToBaseContainers(
-                        await _dataGatherer.GetContainersAsync(dockerHost)
-                    );
-                }
-                else if (systemObj.InstalledContainerEngine == ContainerEngine.Podman)
-                {
-                    throw new NotImplementedException();
-                }
-                _context.Update(systemDataObj);
-            }
-            else
-            {
-                _context.Update(systemDataObj);
-            }
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            //var systemDataObj = _context.SystemDataObj
+            //    .Where(x => x.Id == id)
+            //    .Include(x => x.Containers)
+            //    .Include(x => x.NetworkAddress)
+            //    .FirstOrDefault();
+            //if (systemDataObj == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //var connectionStatus = _dataGatherer
+            //    .IsAPIAvailableAsync(systemDataObj.NetworkAddress.Hostname)
+            //    .Result;
+            //systemDataObj.NetworkAddress.SetStatus(connectionStatus);
+            //if ((ModelState.IsValid) && (connectionStatus == HostAvailability.Connected))
+            //{
+            //    //SystemDataObj systemDataObj = new SystemDataObj(newObj.NetworkAddress);
+            //    //newObj.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(newObj.NetworkAddress);
+            //    HostSystem<BaseContainer> systemObj = new HostSystem<BaseContainer>(systemDataObj);
+            //    if (systemObj.InstalledContainerEngine == ContainerEngine.Docker)
+            //    {
+            //        //Get newContainers as BaseContainer:
+            //        HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(
+            //            systemDataObj
+            //        );
+            //        systemDataObj.ReplaceToBaseContainers(
+            //            await _dataGatherer.GetContainersAsync(dockerHost)
+            //        );
+            //    }
+            //    else if (systemObj.InstalledContainerEngine == ContainerEngine.Podman)
+            //    {
+            //        throw new NotImplementedException();
+            //    }
+            //    _context.Update(systemDataObj);
+            //}
+            //else
+            //{
+            //    _context.Update(systemDataObj);
+            //}
+            //_context.SaveChanges();
+            //return RedirectToAction(nameof(Index));
         }
 
-        // POST: Systems/Update/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Update(Guid id, [Bind("Id,InstalledContainerEngines")] SystemDataObj systemDataObj)
-        //{
-        //    if (id != systemDataObj.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(systemDataObj);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!SystemDataObjExists(systemDataObj.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(systemDataObj);
-        //}
-
-        // GET: Systems/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.SystemDataObj == null)
