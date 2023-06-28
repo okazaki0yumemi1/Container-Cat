@@ -13,8 +13,7 @@ namespace Container_Cat.Data
         public ContainerCatContext(DbContextOptions<ContainerCatContext> options)
             : base(options)
         {
-            this.Database.Migrate();
-            this.Database.EnsureCreated();
+
         }
 
         public DbSet<BaseContainer> BaseContainer { get; set; } =
