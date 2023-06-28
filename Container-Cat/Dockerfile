@@ -13,4 +13,5 @@ RUN dotnet publish -c Debug -o /app
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build-env /app .
+RUN mkdir /Data
 ENTRYPOINT ["dotnet", "Container-Cat.dll"]
