@@ -14,13 +14,13 @@ namespace Container_Cat.Utilities.Models
         {
             Id = Guid.NewGuid();
             NetworkAddress = _networkAddr;
-            NetworkAddress.SetStatus(HostAddress.HostAvailability.NotTested);
+            NetworkAddress.SetStatus(HostAvailability.NotTested);
         }
 
         public SystemDataObj()
         {
             Id = Guid.NewGuid();
-            NetworkAddress.Availability = HostAddress.HostAvailability.NotTested;
+            NetworkAddress.Availability = HostAvailability.NotTested;
             InstalledContainerEngine = ContainerEngine.Unknown;
         }
 

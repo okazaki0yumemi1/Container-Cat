@@ -102,7 +102,7 @@ namespace Container_Cat.Utilities
             return apiType;
         }
 
-        public async Task<HostAddress.HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
+        public async Task<HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
         {
             try
             {
@@ -112,19 +112,19 @@ namespace Container_Cat.Utilities
                 switch ((int)response.StatusCode)
                 {
                     case 200:
-                        return HostAddress.HostAvailability.Connected;
+                        return HostAvailability.Connected;
                     case >= 400
                     and < 500:
-                        return HostAddress.HostAvailability.Unreachable;
+                        return HostAvailability.Unreachable;
                     default:
-                        return HostAddress.HostAvailability.Unreachable;
+                        return HostAvailability.Unreachable;
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("\nException caught while testing host availability.");
                 Console.WriteLine("Message :{0} ", e.Message);
-                return HostAddress.HostAvailability.Unreachable;
+                return HostAvailability.Unreachable;
             }
         }
 
@@ -133,9 +133,9 @@ namespace Container_Cat.Utilities
         )
         {
             var probe = await IsAPIAvailableAsync(dockerHost.NetworkAddress);
-            if (probe == HostAddress.HostAvailability.Connected)
+            if (probe == HostAvailability.Connected)
             {
-                dockerHost.NetworkAddress.SetStatus(HostAddress.HostAvailability.Connected);
+                dockerHost.NetworkAddress.SetStatus(HostAvailability.Connected);
                 DockerContainerOperations cOps = new DockerContainerOperations(
                     _client,
                     dockerHost.NetworkAddress

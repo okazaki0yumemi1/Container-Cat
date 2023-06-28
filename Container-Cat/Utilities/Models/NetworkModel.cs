@@ -4,14 +4,6 @@
     {
         public Guid Id { get; set; }
 
-        public enum HostAvailability
-        {
-            Unreachable,
-            Connected,
-            WaitingForResult,
-            NotTested
-        }
-
         public HostAvailability Availability { get; set; }
         private string hostname = "";
         public string Ip
