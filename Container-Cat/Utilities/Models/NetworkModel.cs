@@ -7,35 +7,35 @@ namespace Container_Cat.Utilities.Models
         public Guid Id { get; set; }
 
         public HostAvailability Availability { get; set; }
-        private string hostname = "";
-        public string Ip
-        {
-            get { return hostname; }
-            set
-            {
-                if (value == null || value.Length < 1)
-                {
-                    hostname = "";
-                }
-                else
-                    hostname = value;
-            }
-        }
+        public string Hostname = "";
+        //public string Ip
+        //{
+        //    get { return hostname; }
+        //    set
+        //    {
+        //        if (value == null || value.Length < 1)
+        //        {
+        //            hostname = "";
+        //        }
+        //        else
+        //            hostname = value;
+        //    }
+        //}
         public string? Port { get; set; }
 
-        public HostAddress(string _ip, string _port)
+        public HostAddress(string _hostname, string _port)
         {
             Id = Guid.NewGuid();
-            Ip = _ip;
+            Hostname = _hostname;
             Port = ":" + _port;
             Availability = HostAvailability.NotTested;
         }
 
-        public HostAddress(string _ip)
+        public HostAddress(string _hostname)
         {
             Id = Guid.NewGuid();
             Port = "";
-            Ip = _ip;
+            Hostname = _hostname;
             Availability = HostAvailability.NotTested;
         }
 
@@ -44,7 +44,7 @@ namespace Container_Cat.Utilities.Models
         public HostAddress(HostAddress newHost)
         {
             Id = newHost.Id;
-            Ip = newHost.Ip;
+            Hostname = newHost.Hostname;
             Port = newHost.Port;
             Availability = newHost.Availability;
         }
