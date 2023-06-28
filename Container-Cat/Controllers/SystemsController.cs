@@ -69,11 +69,11 @@ namespace Container_Cat.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Ip")] string hostname)
         {
-            if (!ModelState.IsValid) return BadRequest();
-            if (hostname.IsNullOrEmpty()) return BadRequest();
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
+            if (hostname.IsNullOrEmpty()) return RedirectToAction(nameof(Index));
 
             var hostStatus = await _dataGatherer.IsAPIAvailableAsync(hostname);
-            if (hostStatus != HostAvailability.Connected) return BadRequest();
+            if (hostStatus != HostAvailability.Connected) return RedirectToAction(nameof(Index));
 
             HostSystemDTO hostSystemDTO = new HostSystemDTO();
             hostSystemDTO.InstalledContainerEngine = await _dataGatherer.ContainerEngineInstalledAsync(hostname);
@@ -89,14 +89,14 @@ namespace Container_Cat.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            else return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Systems/Update/5
         public async Task<IActionResult> Update(Guid? id)
         {
-            if (!ModelState.IsValid) return BadRequest();
-            if (id == null) return BadRequest();
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
+            if (id == null) return RedirectToAction(nameof(Index));
 
             var HostSystem = _context.HostSystems
                 .Where(x => x.Id == id)
