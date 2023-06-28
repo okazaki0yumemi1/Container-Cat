@@ -10,7 +10,7 @@ namespace Container_Cat.Utilities.Models
         new List<T> Containers { get; set; }
         public ContainerEngine InstalledContainerEngine { get; private set; }
 
-        public HostSystem(SystemDataObj dataObj)
+        public HostSystem(HostSystemDTO dataObj)
         {
             Id = dataObj.Id;
             NetworkAddress = dataObj.NetworkAddress;

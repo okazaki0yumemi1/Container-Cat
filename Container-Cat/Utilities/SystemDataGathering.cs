@@ -96,18 +96,18 @@ namespace Container_Cat.Utilities
         //        return false;
         //    }
         //}
-        public async Task<ContainerEngine> ContainerEngineInstalledAsync(HostAddress hostAddress)
+        public async Task<ContainerEngine> ContainerEngineInstalledAsync(string hostAddress)
         {
             var apiType = await DetectApiAsync(hostAddress);
             return apiType;
         }
 
-        public async Task<HostAvailability> IsAPIAvailableAsync(HostAddress hostAddr)
+        public async Task<HostAvailability> IsAPIAvailableAsync(string hostAddr)//)
         {
             try
             {
                 using HttpResponseMessage response = await _client.GetAsync(
-                    $"http://{hostAddr.Ip}{hostAddr.Port}/info"
+                    $"http://{hostAddr}/info"
                 );
                 switch ((int)response.StatusCode)
                 {
