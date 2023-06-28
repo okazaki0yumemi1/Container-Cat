@@ -3,6 +3,7 @@ using System;
 using Container_Cat.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Container_Cat.Migrations
 {
     [DbContext(typeof(ContainerCatContext))]
-    partial class ContainerCatContextModelSnapshot : ModelSnapshot
+    [Migration("20230626115455_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.7");
@@ -75,7 +78,7 @@ namespace Container_Cat.Migrations
 
                     b.HasIndex("BaseContainerobjId");
 
-                    b.ToTable("Mounts");
+                    b.ToTable("Mount");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Port", b =>
@@ -103,7 +106,7 @@ namespace Container_Cat.Migrations
 
                     b.HasIndex("BaseContainerobjId");
 
-                    b.ToTable("Ports");
+                    b.ToTable("Port");
                 });
 
             modelBuilder.Entity("Container_Cat.Utilities.Models.HostAddress", b =>
@@ -115,12 +118,16 @@ namespace Container_Cat.Migrations
                     b.Property<int>("Availability")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Port")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("HostAddresses");
+                    b.ToTable("HostAddress");
                 });
 
             modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
@@ -129,14 +136,10 @@ namespace Container_Cat.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("InstalledContainerEngine")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("NetworkAddressId")
+                    b.Property<Guid>("NetworkAddressId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -144,17 +147,6 @@ namespace Container_Cat.Migrations
                     b.HasIndex("NetworkAddressId");
 
                     b.ToTable("SystemDataObj");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("SystemDataObj");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
-                {
-                    b.HasBaseType("Container_Cat.Utilities.Models.SystemDataObj");
-
-                    b.HasDiscriminator().HasValue("HostSystem<BaseContainer>");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.BaseContainer", b =>
@@ -182,7 +174,9 @@ namespace Container_Cat.Migrations
                 {
                     b.HasOne("Container_Cat.Utilities.Models.HostAddress", "NetworkAddress")
                         .WithMany()
-                        .HasForeignKey("NetworkAddressId");
+                        .HasForeignKey("NetworkAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("NetworkAddress");
                 });

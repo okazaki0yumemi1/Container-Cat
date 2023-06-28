@@ -361,7 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Container-Cat/Migrations
 /Container-Cat/TestDB.db
 /Container-Cat/TestDB.db-shm
 /Container-Cat/TestDB.db-wal
@@ -372,3 +371,4 @@ FodyWeavers.xsd
 /Container-Cat/Utilities/SystemOperations.cs
 /Container-Cat/Data/SQlLiteDatabase.db-wal
 /Container-Cat/Data/SQlLiteDatabase.db-shm
+.*db

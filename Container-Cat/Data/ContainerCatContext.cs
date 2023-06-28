@@ -21,7 +21,5 @@ namespace Container_Cat.Data
         public DbSet<SystemDataObj> SystemDataObj { get; set; } = default!;
         public DbSet<HostAddress> HostAddresses { get; set; } = default!;
         public DbSet<HostSystem<BaseContainer>> HostSystems { get; set; } = default!;
-        public DbSet<DockerContainer> DockerContainers { get; set; } = default!;
-        public DbSet<PodmanContainer> PodmanContainers { get; set; } = default!;
     }
 }
