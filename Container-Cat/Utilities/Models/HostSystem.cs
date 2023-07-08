@@ -2,12 +2,12 @@
 
 namespace Container_Cat.Utilities.Models
 {
-    public class HostSystem<T> : SystemDataObj
+    public class HostSystem<T> : SystemEntity
         where T : BaseContainer
     {
         Guid Id { get; set; }
         public HostAddress NetworkAddress { get; private set; }
-        new List<T> Containers { get; set; }
+        public List<T> Containers { get; set; }
         public ContainerEngine InstalledContainerEngine { get; private set; }
 
         public HostSystem(HostSystemDTO dataObj)
@@ -26,5 +26,6 @@ namespace Container_Cat.Utilities.Models
             NetworkAddress.SetStatus(_networkAddr.Availability);
         }
         public HostSystem() {}
+        
     }
 }

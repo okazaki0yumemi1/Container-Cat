@@ -16,9 +16,11 @@ namespace Container_Cat.Containers.EngineAPI.Models
         [NotMapped]
         public string[]? Names { get; set; }
         public int Created { get; set; }
+        [NotMapped]
         public Labels? Labels { get; set; }
-        public Hostconfig? HostConfig { get; set; }
-        public Networksettings? NetworkSettings { get; set;}
+        public string? HostConfig { get; set; }
+        public List<Networks> NetworkSettings { get; set;}
+        public List<Mount> Mounts {get; set;}
     }
 
     public class Labels
@@ -56,6 +58,8 @@ namespace Container_Cat.Containers.EngineAPI.Models
 
     public class Networks
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string objId { get; set; }
         public string? NetworkID { get; set; }
         public string? EndpointID { get; set; }
         public string? Gateway { get; set; }
@@ -70,6 +74,7 @@ namespace Container_Cat.Containers.EngineAPI.Models
     public class Mount
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string objId { get; set; }
         public string? Id { get; set; }
         public string? Type { get; set; }
         public string? Source { get; set; }

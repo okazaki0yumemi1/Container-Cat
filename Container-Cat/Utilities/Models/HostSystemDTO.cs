@@ -18,6 +18,12 @@ namespace Container_Cat.Utilities.Models
         {
             Id = Guid.NewGuid();
         }
+        public HostSystemDTO(SystemEntity newObj)
+        {
+            Id = newObj.Id;
+            NetworkAddress = newObj.NetworkAddress;
+            InstalledContainerEngine = newObj.InstalledContainerEngine;
+        }
 
         public HostSystemDTO(HostSystem<BaseContainer> newObj)
         {

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Container_Cat.PodmanAPI.Models
 {
+    [NotMapped]
     public class PodmanContainer : BaseContainer
     {
         public new string Id { get; set; }
