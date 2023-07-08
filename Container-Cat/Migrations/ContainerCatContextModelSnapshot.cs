@@ -23,6 +23,9 @@ namespace Container_Cat.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("HostSystemId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Id")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -38,14 +41,11 @@ namespace Container_Cat.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("SystemDataObjId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("objId");
 
-                    b.HasIndex("SystemDataObjId");
+                    b.HasIndex("HostSystemId");
 
-                    b.ToTable("BaseContainer");
+                    b.ToTable("BaseContainers");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Mount", b =>
@@ -123,45 +123,30 @@ namespace Container_Cat.Migrations
                     b.ToTable("HostAddresses");
                 });
 
-            modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
+            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("InstalledContainerEngine")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("NetworkAddressId")
+                    b.Property<Guid>("NetworkAddressId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NetworkAddressId");
 
-                    b.ToTable("SystemDataObj");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("SystemDataObj");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
-                {
-                    b.HasBaseType("Container_Cat.Utilities.Models.SystemDataObj");
-
-                    b.HasDiscriminator().HasValue("HostSystem<BaseContainer>");
+                    b.ToTable("HostSystemBase");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.BaseContainer", b =>
                 {
-                    b.HasOne("Container_Cat.Utilities.Models.SystemDataObj", null)
+                    b.HasOne("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", null)
                         .WithMany("Containers")
-                        .HasForeignKey("SystemDataObjId");
+                        .HasForeignKey("HostSystemId");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Mount", b =>
@@ -178,11 +163,13 @@ namespace Container_Cat.Migrations
                         .HasForeignKey("BaseContainerobjId");
                 });
 
-            modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
+            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
                 {
                     b.HasOne("Container_Cat.Utilities.Models.HostAddress", "NetworkAddress")
                         .WithMany()
-                        .HasForeignKey("NetworkAddressId");
+                        .HasForeignKey("NetworkAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("NetworkAddress");
                 });
@@ -194,7 +181,7 @@ namespace Container_Cat.Migrations
                     b.Navigation("Ports");
                 });
 
-            modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
+            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
                 {
                     b.Navigation("Containers");
                 });

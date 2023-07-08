@@ -26,24 +26,27 @@ namespace Container_Cat.Controllers
         // GET: Systems
         public async Task<IActionResult> Index()
         {
-            var hosts = await _context.SystemEntities
+            var results = await _context.HostSystemBase
                                 .Include(networks => networks.NetworkAddress)
+                                .Include(x => x.Containers)
                                 .ToListAsync();
-
-            return View(hosts);
+            return View(results);
         }
 
         // GET: Systems/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.SystemEntities == null)
+            if (id == null || _context.HostSystemBase == null)
             {
                 return NotFound();
             }
             
             //Get host without containers:
 
-            var result = await _context.SystemEntities
+            var result = await _context.HostSystemBase
+                .Include(x => x.Containers)
+                .Include(x => x.Containers).ThenInclude(y => y.Ports)
+                .Include(x => x.Containers).ThenInclude(y => y.Mounts)
                 .FirstOrDefaultAsync(m => m.Id == id);
             
             if (result == null)
@@ -53,15 +56,6 @@ namespace Container_Cat.Controllers
             
             //Create host obj with containers
             HostSystemDTO hostDTO = new HostSystemDTO(result);
-
-            if (result.InstalledContainerEngine == ContainerEngine.Docker)
-            {
-                //Get host containers (Docker)
-                var containers = _context.DockerContainers.Where(x => result.ContainerIDs.Contains(x.objId)).ToList<DockerContainer>();
-                //Convert Docker to Base
-                hostDTO.ConvertToBaseContainers(containers);
-            }
-
             return View(hostDTO);
         }
 
@@ -91,16 +85,14 @@ namespace Container_Cat.Controllers
             if (hostSystemDTO.InstalledContainerEngine == ContainerEngine.Docker)
             {
                 //Get newContainers as BaseContainer:
-                HostSystem<DockerContainer> dockerHost = new HostSystem<DockerContainer>(hostSystemDTO);
-                var containers = await _dataGatherer.GetContainersAsync(dockerHost);
-                _context.Add(containers);
-                //Get containers IDs
-                var containerIds = containers.Select(x => x.objId).ToList<string>();
-                //Put the into SystemObject:
-                SystemEntity hostObj = new SystemEntity(hostSystemDTO.NetworkAddress);
-                hostObj.ContainerIDs.AddRange(containers.Select(x => x.objId).ToList<string>());
-                _context.Add(hostObj);
-                //hostSystemDTO.ConvertToBaseContainers(containers);
+                HostSystem<BaseContainer> host = new HostSystem<BaseContainer>(hostSystemDTO);
+                var containers = await _dataGatherer.GetContainersAsync(host);
+                host.Containers.AddRange(containers);
+
+                //Add HostSystem & containers:
+                _context.Add(host);
+
+                //Save changes:
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -113,7 +105,7 @@ namespace Container_Cat.Controllers
             if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
             if (id == null) return RedirectToAction(nameof(Index));
 
-            var systemEntity = await _context.SystemEntities
+            var systemEntity = await _context.HostSystemBase
                 .FirstOrDefaultAsync(m => m.Id == id);
             
             if (systemEntity  == null)
@@ -122,19 +114,18 @@ namespace Container_Cat.Controllers
             }
             //Delete, then create new
 
-//            _context.Update(HostSystem);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.SystemEntities == null)
+            if (id == null || _context.HostSystemBase == null)
             {
                 return NotFound();
             }
 
-            var result = await _context.SystemEntities.FindAsync(id);
+            var result = await _context.HostSystemBase.FindAsync(id);
             if (result == null)
             {
                 return NotFound();
@@ -148,30 +139,30 @@ namespace Container_Cat.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if ((_context.SystemEntities == null) || (_context.DockerContainers == null))
+            if ((_context.HostSystemBase == null) || (_context.BaseContainers == null))
             {
                 return Problem("Entity sets are null.");
             }
             //Explicit loading of data for deletion:
-            var hostSystem  = await _context.SystemEntities 
+            var systemEntity  = await _context.HostSystemBase 
                 .Where(x => x.Id == id).FirstOrDefaultAsync();
-                //by id
-            var containers = await _context.DockerContainers.Where(x => hostSystem.ContainerIDs.Contains(x.objId))
-                .Include(ports => ports.Ports)
-                //related Container.Ports objects
-                .Include(mounts => mounts.Mounts)
-                //related Container.Mounts objects
-                .ToListAsync();
+            
+            //Explicit loading of HostSystem & containers
+            var hostSystem = await _context.HostSystemBase.Where(x => x.Id == id)
+                .Include(items => items.Containers)
+                .Include(containers => containers.Containers).ThenInclude(ports => ports.Ports)
+                .Include(containers => containers.Containers).ThenInclude(mounts => mounts.Mounts)
+                .FirstOrDefaultAsync();
+
             if (hostSystem != null)
             {
-                foreach (var container in containers)
+                foreach (var container in hostSystem.Containers)
                 {
                     _context.RemoveRange(container.Mounts);
                     _context.RemoveRange(container.Ports);
                 }
-                _context.DockerContainers.RemoveRange(containers);
+                _context.BaseContainers.RemoveRange(hostSystem.Containers);
                 _context.HostAddresses.Remove(hostSystem.NetworkAddress);
-                _context.SystemEntities.Remove(hostSystem);
             }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -179,12 +170,12 @@ namespace Container_Cat.Controllers
 
         private bool SystemDataObjExists(Guid id)
         {
-            return (_context.SystemEntities?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.HostSystemBase?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
         public async Task<int> StageDeleteContainerByID(string id)
         {
-            var containerToRemove = await _context.BaseContainer
+            var containerToRemove = await _context.BaseContainers
                 .Include(x => x.Ports)
                 .Include(x => x.Mounts)
                 .FirstOrDefaultAsync();

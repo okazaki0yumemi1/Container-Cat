@@ -2,10 +2,9 @@
 
 namespace Container_Cat.Utilities.Models
 {
-    public class HostSystem<T> : SystemEntity
-        where T : BaseContainer
+    public class HostSystem<T> where T : BaseContainer
     {
-        Guid Id { get; set; }
+        public Guid Id { get; private set; }
         public HostAddress NetworkAddress { get; private set; }
         public List<T> Containers { get; set; }
         public ContainerEngine InstalledContainerEngine { get; private set; }

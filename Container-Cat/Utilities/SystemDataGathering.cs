@@ -128,15 +128,15 @@ namespace Container_Cat.Utilities
             }
         }
 
-        public async Task<List<DockerContainer>> GetContainersAsync(
-            HostSystem<DockerContainer> dockerHost
+        public async Task<List<BaseContainer>> GetContainersAsync(
+            HostSystem<BaseContainer> dockerHost
         )
         {
             var probe = await IsAPIAvailableAsync(dockerHost.NetworkAddress.Hostname);
             if (probe == HostAvailability.Connected)
             {
                 dockerHost.NetworkAddress.SetStatus(HostAvailability.Connected);
-                DockerContainerOperations cOps = new DockerContainerOperations(
+                BaseContainerOperations cOps = new BaseContainerOperations(
                     _client,
                     dockerHost.NetworkAddress
                 );
@@ -146,7 +146,7 @@ namespace Container_Cat.Utilities
                     Console.WriteLine(
                         $"Failed to get container list for {dockerHost.NetworkAddress.Hostname}, empty container will be added."
                     );
-                    return (new List<DockerContainer>());
+                    return (new List<BaseContainer>());
                 }
                 else
                 {
@@ -154,7 +154,7 @@ namespace Container_Cat.Utilities
                 }
             }
             else
-                return (new List<DockerContainer>());
+                return (new List<BaseContainer>());
         }
     }
 }

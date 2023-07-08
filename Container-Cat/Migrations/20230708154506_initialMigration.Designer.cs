@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Container_Cat.Migrations
 {
     [DbContext(typeof(ContainerCatContext))]
-    [Migration("20230626115455_Initial")]
-    partial class Initial
+    [Migration("20230708154506_initialMigration")]
+    partial class initialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,9 @@ namespace Container_Cat.Migrations
                 {
                     b.Property<string>("objId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("HostSystemId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Id")
@@ -41,14 +44,11 @@ namespace Container_Cat.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("SystemDataObjId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("objId");
 
-                    b.HasIndex("SystemDataObjId");
+                    b.HasIndex("HostSystemId");
 
-                    b.ToTable("BaseContainer");
+                    b.ToTable("BaseContainers");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Mount", b =>
@@ -78,7 +78,7 @@ namespace Container_Cat.Migrations
 
                     b.HasIndex("BaseContainerobjId");
 
-                    b.ToTable("Mount");
+                    b.ToTable("Mounts");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Port", b =>
@@ -106,7 +106,7 @@ namespace Container_Cat.Migrations
 
                     b.HasIndex("BaseContainerobjId");
 
-                    b.ToTable("Port");
+                    b.ToTable("Ports");
                 });
 
             modelBuilder.Entity("Container_Cat.Utilities.Models.HostAddress", b =>
@@ -118,19 +118,15 @@ namespace Container_Cat.Migrations
                     b.Property<int>("Availability")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Ip")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Port")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("HostAddress");
+                    b.ToTable("HostAddresses");
                 });
 
-            modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
+            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -146,14 +142,14 @@ namespace Container_Cat.Migrations
 
                     b.HasIndex("NetworkAddressId");
 
-                    b.ToTable("SystemDataObj");
+                    b.ToTable("HostSystemBase");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.BaseContainer", b =>
                 {
-                    b.HasOne("Container_Cat.Utilities.Models.SystemDataObj", null)
+                    b.HasOne("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", null)
                         .WithMany("Containers")
-                        .HasForeignKey("SystemDataObjId");
+                        .HasForeignKey("HostSystemId");
                 });
 
             modelBuilder.Entity("Container_Cat.Containers.Models.Mount", b =>
@@ -170,7 +166,7 @@ namespace Container_Cat.Migrations
                         .HasForeignKey("BaseContainerobjId");
                 });
 
-            modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
+            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
                 {
                     b.HasOne("Container_Cat.Utilities.Models.HostAddress", "NetworkAddress")
                         .WithMany()
@@ -188,7 +184,7 @@ namespace Container_Cat.Migrations
                     b.Navigation("Ports");
                 });
 
-            modelBuilder.Entity("Container_Cat.Utilities.Models.SystemDataObj", b =>
+            modelBuilder.Entity("Container_Cat.Utilities.Models.HostSystem<Container_Cat.Containers.Models.BaseContainer>", b =>
                 {
                     b.Navigation("Containers");
                 });

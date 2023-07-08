@@ -6,9 +6,9 @@ using Container_Cat.Containers.ApiRoutes;
 
 namespace Container_Cat.Containers.EngineAPI
 {
-    public class DockerContainerOperations : IContainerOperations<DockerContainer>
+    public class BaseContainerOperations : IContainerOperations<BaseContainer>
     {
-        public DockerContainerOperations(HttpClient _client, HostAddress _nAddr)
+        public BaseContainerOperations(HttpClient _client, HostAddress _nAddr)
         {
             client = _client;
             networkAddr = _nAddr;
@@ -17,9 +17,9 @@ namespace Container_Cat.Containers.EngineAPI
         private readonly HttpClient client;
         private readonly HostAddress networkAddr;
 
-        public async Task<List<DockerContainer>> ListContainersAsync()
+        public async Task<List<BaseContainer>> ListContainersAsync()
         {
-            List<DockerContainer> result = new List<DockerContainer>();
+            List<BaseContainer> result = new List<BaseContainer>();
             try
             {
                 HttpResponseMessage response = await client.GetAsync(
@@ -29,7 +29,11 @@ namespace Container_Cat.Containers.EngineAPI
                 if (response.IsSuccessStatusCode)
                 {
                     string str = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<List<DockerContainer>>(str);
+                    
+                    var jsonSerializerSettings = new JsonSerializerSettings();
+                    jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+                    result = JsonConvert.DeserializeObject<List<BaseContainer>>(str, jsonSerializerSettings);
+                    //result = JsonConvert.DeserializeObject<List<DockerContainer>>(str, jsonSerializerSettings);
                     return result;
                 }
                 else
@@ -43,7 +47,7 @@ namespace Container_Cat.Containers.EngineAPI
             }
         }
 
-        public async Task<DockerContainer> GetContainerByIDAsync(string Id)
+        public async Task<BaseContainer> GetContainerByIDAsync(string Id)
         {
             DockerContainer container = new DockerContainer();
             var uri =
@@ -65,7 +69,7 @@ namespace Container_Cat.Containers.EngineAPI
             }
         }
 
-        public Task<DockerContainer> GetContainerByNameAsync(string Name)
+        public Task<BaseContainer> GetContainerByNameAsync(string Name)
         {
             throw new NotImplementedException();
         }

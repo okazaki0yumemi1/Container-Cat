@@ -14,12 +14,11 @@ namespace Container_Cat.Data
 
         }
 
-        public DbSet<BaseContainer> BaseContainer { get; set; } = default!; 
-        //public DbSet<Containers.Models.Port> Ports { get; set; } = default!;
-        //public DbSet<Containers.Models.Mount> Mounts { get; set; } = default!;
-        //public DbSet<SystemDataObj> SystemDataObj { get; set; } = default!;
+        public DbSet<BaseContainer> BaseContainers { get; set; } = default!; 
+        public DbSet<Containers.Models.Port> Ports { get; set; } = default!;
+        public DbSet<Containers.Models.Mount> Mounts { get; set; } = default!;
+        public DbSet<HostSystem<BaseContainer>> HostSystemBase { get; set; } = default!;
         public DbSet<HostAddress> HostAddresses { get; set; } = default!;
-        public DbSet<SystemEntity> SystemEntities { get; set; } = default!;
-        public DbSet<DockerContainer> DockerContainers {get; set;} = default!;
+        //public DbSet<DockerContainer> DockerContainers {get; set;} = default!;
     }
 }

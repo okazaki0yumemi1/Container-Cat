@@ -6,27 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Container_Cat.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "HostAddress",
+                name: "HostAddresses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Availability = table.Column<int>(type: "INTEGER", nullable: false),
-                    Ip = table.Column<string>(type: "TEXT", nullable: false),
                     Port = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HostAddress", x => x.Id);
+                    table.PrimaryKey("PK_HostAddresses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SystemDataObj",
+                name: "HostSystemBase",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -35,17 +34,17 @@ namespace Container_Cat.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SystemDataObj", x => x.Id);
+                    table.PrimaryKey("PK_HostSystemBase", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SystemDataObj_HostAddress_NetworkAddressId",
+                        name: "FK_HostSystemBase_HostAddresses_NetworkAddressId",
                         column: x => x.NetworkAddressId,
-                        principalTable: "HostAddress",
+                        principalTable: "HostAddresses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BaseContainer",
+                name: "BaseContainers",
                 columns: table => new
                 {
                     objId = table.Column<string>(type: "TEXT", nullable: false),
@@ -53,20 +52,20 @@ namespace Container_Cat.Migrations
                     State = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     Image = table.Column<string>(type: "TEXT", nullable: false),
-                    SystemDataObjId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    HostSystemBaseContainerId = table.Column<Guid>(name: "HostSystem<BaseContainer>Id", type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BaseContainer", x => x.objId);
+                    table.PrimaryKey("PK_BaseContainers", x => x.objId);
                     table.ForeignKey(
-                        name: "FK_BaseContainer_SystemDataObj_SystemDataObjId",
-                        column: x => x.SystemDataObjId,
-                        principalTable: "SystemDataObj",
+                        name: "FK_BaseContainers_HostSystemBase_HostSystem<BaseContainer>Id",
+                        column: x => x.HostSystemBaseContainerId,
+                        principalTable: "HostSystemBase",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Mount",
+                name: "Mounts",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
@@ -78,16 +77,16 @@ namespace Container_Cat.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mount", x => x.Id);
+                    table.PrimaryKey("PK_Mounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Mount_BaseContainer_BaseContainerobjId",
+                        name: "FK_Mounts_BaseContainers_BaseContainerobjId",
                         column: x => x.BaseContainerobjId,
-                        principalTable: "BaseContainer",
+                        principalTable: "BaseContainers",
                         principalColumn: "objId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Port",
+                name: "Ports",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
@@ -99,52 +98,52 @@ namespace Container_Cat.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Port", x => x.Id);
+                    table.PrimaryKey("PK_Ports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Port_BaseContainer_BaseContainerobjId",
+                        name: "FK_Ports_BaseContainers_BaseContainerobjId",
                         column: x => x.BaseContainerobjId,
-                        principalTable: "BaseContainer",
+                        principalTable: "BaseContainers",
                         principalColumn: "objId");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BaseContainer_SystemDataObjId",
-                table: "BaseContainer",
-                column: "SystemDataObjId");
+                name: "IX_BaseContainers_HostSystem<BaseContainer>Id",
+                table: "BaseContainers",
+                column: "HostSystem<BaseContainer>Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Mount_BaseContainerobjId",
-                table: "Mount",
-                column: "BaseContainerobjId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Port_BaseContainerobjId",
-                table: "Port",
-                column: "BaseContainerobjId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SystemDataObj_NetworkAddressId",
-                table: "SystemDataObj",
+                name: "IX_HostSystemBase_NetworkAddressId",
+                table: "HostSystemBase",
                 column: "NetworkAddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Mounts_BaseContainerobjId",
+                table: "Mounts",
+                column: "BaseContainerobjId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ports_BaseContainerobjId",
+                table: "Ports",
+                column: "BaseContainerobjId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Mount");
+                name: "Mounts");
 
             migrationBuilder.DropTable(
-                name: "Port");
+                name: "Ports");
 
             migrationBuilder.DropTable(
-                name: "BaseContainer");
+                name: "BaseContainers");
 
             migrationBuilder.DropTable(
-                name: "SystemDataObj");
+                name: "HostSystemBase");
 
             migrationBuilder.DropTable(
-                name: "HostAddress");
+                name: "HostAddresses");
         }
     }
 }
