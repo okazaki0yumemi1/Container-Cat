@@ -7,7 +7,7 @@ namespace Container_Cat.Utilities.Models
         public Guid Id { get; set; }
 
         public HostAvailability Availability { get; set; }
-        public string Hostname = "";
+        public string Hostname {get; set;}
         //public string Ip
         //{
         //    get { return hostname; }
