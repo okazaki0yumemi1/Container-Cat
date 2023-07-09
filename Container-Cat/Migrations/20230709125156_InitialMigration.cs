@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Container_Cat.Migrations
 {
     /// <inheritdoc />
-    public partial class initialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,7 @@ namespace Container_Cat.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Availability = table.Column<int>(type: "INTEGER", nullable: false),
+                    Hostname = table.Column<string>(type: "TEXT", nullable: false),
                     Port = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>

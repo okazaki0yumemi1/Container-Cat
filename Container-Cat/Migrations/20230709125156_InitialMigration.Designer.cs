@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Container_Cat.Migrations
 {
     [DbContext(typeof(ContainerCatContext))]
-    [Migration("20230708154506_initialMigration")]
-    partial class initialMigration
+    [Migration("20230709125156_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -117,6 +117,10 @@ namespace Container_Cat.Migrations
 
                     b.Property<int>("Availability")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Hostname")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Port")
                         .HasColumnType("TEXT");

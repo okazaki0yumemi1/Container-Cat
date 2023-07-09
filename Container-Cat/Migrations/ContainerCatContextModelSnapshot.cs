@@ -115,6 +115,10 @@ namespace Container_Cat.Migrations
                     b.Property<int>("Availability")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Hostname")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Port")
                         .HasColumnType("TEXT");
 
