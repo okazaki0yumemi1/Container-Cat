@@ -90,7 +90,9 @@ namespace Container_Cat.Controllers
                 host.Containers.AddRange(containers);
 
                 //Add HostSystem & containers:
+                //_context.Add(host.NetworkAddress);
                 _context.Add(host);
+
 
                 //Save changes:
                 await _context.SaveChangesAsync();
@@ -152,6 +154,7 @@ namespace Container_Cat.Controllers
                 .Include(items => items.Containers)
                 .Include(containers => containers.Containers).ThenInclude(ports => ports.Ports)
                 .Include(containers => containers.Containers).ThenInclude(mounts => mounts.Mounts)
+                .Include(network => network.NetworkAddress)
                 .FirstOrDefaultAsync();
 
             if (hostSystem != null)
@@ -160,8 +163,9 @@ namespace Container_Cat.Controllers
                 {
                     _context.RemoveRange(container.Mounts);
                     _context.RemoveRange(container.Ports);
+                    _context.BaseContainers.Remove(container);
                 }
-                _context.BaseContainers.RemoveRange(hostSystem.Containers);
+                //_context.BaseContainers.RemoveRange(hostSystem.Containers);
                 _context.HostAddresses.Remove(hostSystem.NetworkAddress);
             }
             await _context.SaveChangesAsync();
